@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/leetcode/easy/88MergeSortedArray"/><meta name="twitter:url" content="https://justcodewithkhanh.com/leetcode/easy/88MergeSortedArray"/><meta name="og:url" content="https://justcodewithkhanh.com/leetcode/easy/88MergeSortedArray"/><title>88. Merge Sorted Array | Just Code with Khanh</title><meta name="twitter:title" content="88. Merge Sorted Array | Just Code with Khanh"/><meta name="og:title" content="88. Merge Sorted Array | Just Code with Khanh"/><meta name="description" content="Learning by doing. Just start coding!!! 👨🏻‍💻"/><meta name="twitter:description" content="Learning by doing. Just start coding!!! 👨🏻‍💻"/><meta name="og:description" content="Learning by doing. Just start coding!!! 👨🏻‍💻"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo.png"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo.png"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-swift"><a href="/swift">Swift</a></li><li class="nav-leetcode"><a class="selected" href="/leetcode">LeetCode</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><h1><strong>88. Merge Sorted Array</strong></h1><pre data-language="java"><code><span class="hljs-comment">// https://leetcode.com/problems/merge-sorted-array/</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-keyword">int</span>[] nums1, <span class="hljs-keyword">int</span> m, <span class="hljs-keyword">int</span>[] nums2, <span class="hljs-keyword">int</span> n)</span> </span>{
+        <span class="hljs-keyword">int</span> p1 = m - <span class="hljs-number">1</span>, p2 = n - <span class="hljs-number">1</span>, size = m + n -<span class="hljs-number">1</span>;
+        <span class="hljs-keyword">while</span>(p1 &gt;= <span class="hljs-number">0</span> &amp;&amp; p2 &gt;= <span class="hljs-number">0</span>){
+            <span class="hljs-keyword">if</span>(nums1[p1] &gt; nums2[p2]) nums1[size--] = nums1[p1--];
+            <span class="hljs-keyword">else</span> nums1[size--] = nums2[p2--];
+        }
+        
+        <span class="hljs-keyword">while</span>(p2 &gt;= <span class="hljs-number">0</span>) nums1[size--] = nums2[p2--];
+        
+
+<span class="hljs-comment">// Slower solution        </span>
+<span class="hljs-comment">//         int total = m + n;</span>
+<span class="hljs-comment">//         for(int i = 0; i&lt;n; i++){</span>
+<span class="hljs-comment">//             nums1[i + m] = nums2[i];</span>
+<span class="hljs-comment">//         }</span>
+
+<span class="hljs-comment">//         for(int i = 0; i &lt; total; i++){</span>
+<span class="hljs-comment">//             if(i - 1 &gt;= 0 &amp;&amp; nums1[i -1] &lt;= nums1[i]) continue;</span>
+<span class="hljs-comment">//             int current = i;</span>
+<span class="hljs-comment">//             while(current - 1 &gt;= 0 &amp;&amp; nums1[current] &lt; nums1[current -1]){</span>
+<span class="hljs-comment">//                 int temp = nums1[current];</span>
+<span class="hljs-comment">//                 nums1[current] = nums1[current -1];</span>
+<span class="hljs-comment">//                 nums1[current - 1] = temp;</span>
+<span class="hljs-comment">//                 current--;</span>
+<span class="hljs-comment">//             }</span>
+
+<span class="hljs-comment">//         }</span>
+        
+    }
+}
+</code></pre></div><span>Tagged with: </span><ul class="tag-list"><li class="color-f"><a href="/tags/java">java</a></li><li class="color-e"><a href="/tags/easy">easy</a></li><li class="color-b"><a href="/tags/array">array</a></li></ul></article></div></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></p><p>👨🏻‍💻 A Swift and SwiftUI fan. 📚</p><p>Copyright © Khanh N 2020. All rights reserved.</p><p>Generated using <a href="https://github.com/johnsundell/publish">Publish.</a></p></div></div></footer></body></html>
