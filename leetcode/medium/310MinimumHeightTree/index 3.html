@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/leetcode/medium/310MinimumHeightTree"/><meta name="twitter:url" content="https://justcodewithkhanh.com/leetcode/medium/310MinimumHeightTree"/><meta name="og:url" content="https://justcodewithkhanh.com/leetcode/medium/310MinimumHeightTree"/><title>310. Minimum Height Tree | Just Code with Khanh</title><meta name="twitter:title" content="310. Minimum Height Tree | Just Code with Khanh"/><meta name="og:title" content="310. Minimum Height Tree | Just Code with Khanh"/><meta name="description" content="Learning by doing. Just start coding!!! 👨🏻‍💻"/><meta name="twitter:description" content="Learning by doing. Just start coding!!! 👨🏻‍💻"/><meta name="og:description" content="Learning by doing. Just start coding!!! 👨🏻‍💻"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo.png"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo.png"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-swift"><a href="/swift">Swift</a></li><li class="nav-leetcode"><a class="selected" href="/leetcode">LeetCode</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><h1><strong>310. Minimum Height Tree</strong></h1><pre data-language="java"><code><span class="hljs-comment">// https://leetcode.com/problems/minimum-height-trees/</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Solution</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;Integer&gt; <span class="hljs-title">findMinHeightTrees</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n, <span class="hljs-keyword">int</span>[][] edges)</span> </span>{
+        List&lt;Integer&gt; res = <span class="hljs-keyword">new</span> LinkedList&lt;&gt;();
+        <span class="hljs-comment">// Edge case</span>
+        <span class="hljs-keyword">if</span>(n &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> res;
+        
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(n == <span class="hljs-number">1</span>){
+            res.add(<span class="hljs-number">0</span>);
+            <span class="hljs-keyword">return</span> res;
+        }
+        
+        <span class="hljs-comment">// Rebuilding a graph</span>
+        Map&lt;Integer, List&lt;Integer&gt;&gt; graph = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();
+        <span class="hljs-comment">// Count degree</span>
+        <span class="hljs-keyword">int</span>[] occ = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[n];
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span>[] i : edges){
+            <span class="hljs-keyword">if</span>(!graph.containsKey(i[<span class="hljs-number">0</span>])) graph.put(i[<span class="hljs-number">0</span>], <span class="hljs-keyword">new</span> LinkedList&lt;&gt;());
+            <span class="hljs-keyword">if</span>(!graph.containsKey(i[<span class="hljs-number">1</span>])) graph.put(i[<span class="hljs-number">1</span>], <span class="hljs-keyword">new</span> LinkedList&lt;&gt;());
+            graph.get(i[<span class="hljs-number">0</span>]).add(i[<span class="hljs-number">1</span>]);
+            graph.get(i[<span class="hljs-number">1</span>]).add(i[<span class="hljs-number">0</span>]);
+            occ[i[<span class="hljs-number">0</span>]]++;
+            occ[i[<span class="hljs-number">1</span>]]++;
+        }
+        
+        <span class="hljs-comment">// Queue to add all the leave</span>
+        Queue&lt;Integer&gt; que = <span class="hljs-keyword">new</span> LinkedList&lt;&gt;();
+        <span class="hljs-comment">// add leaves</span>
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++){
+            <span class="hljs-keyword">if</span>(occ[i] == <span class="hljs-number">1</span>) que.add(i);
+        }
+        <span class="hljs-comment">// the idea is to use degree of each node</span>
+        <span class="hljs-comment">// traverse through each node neighbor and</span>
+        <span class="hljs-comment">// decrement the degree. this can view as</span>
+        <span class="hljs-comment">// that we have traverse to that neightbor</span>
+        <span class="hljs-comment">// In the view of tree, we basically remove all the leave</span>
+        <span class="hljs-comment">// whatever left over in the que when n &lt; 2 is the answer;</span>
+        <span class="hljs-comment">// Because the possible root node of the three will have the highest degree</span>
+        <span class="hljs-keyword">while</span>(n &gt; <span class="hljs-number">2</span>){
+            <span class="hljs-keyword">int</span> size = que.size();
+            n -= size;
+            <span class="hljs-comment">// go through each leave</span>
+            <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; size; i++){
+                <span class="hljs-keyword">int</span> head = que.poll();
+                <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> j : graph.get(head)){
+                    occ[j]--;
+                    <span class="hljs-keyword">if</span>(occ[j] == <span class="hljs-number">1</span>) que.offer(j);              
+                }
+            }
+        }
+        
+        res.addAll(que);
+        <span class="hljs-keyword">return</span> res;        
+    }
+    
+}
+</code></pre></div><span>Tagged with: </span><ul class="tag-list"><li class="color-d"><a href="/tags/java">java</a></li><li class="color-b"><a href="/tags/medium">medium</a></li><li class="color-a"><a href="/tags/tree">tree</a></li></ul></article></div></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></p><p>👨🏻‍💻 A Swift and SwiftUI fan. 📚</p><p>Copyright © Khanh N 2020. All rights reserved.</p><p>Generated using <a href="https://github.com/johnsundell/publish">Publish.</a></p></div></div></footer></body></html>

@@ -11,7 +11,6 @@ html {
     box-sizing: border-box;
 }
 
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -118,7 +117,7 @@ body {
 #footer .wrapper .inner {
     float: left;
     display: block;
-    margin-left: 15%;
+    margin-left: 10%;
     margin-right: 2.35765%;
 }
 
@@ -193,6 +192,7 @@ body {
 
 #header .wrapper .inner {
     width: 100%;
+    margin-left: 40px;
 }
 
 @media screen and (max-width: 1024px) {
@@ -512,6 +512,10 @@ p {
 
 p.description {
     text-align: center;
+}
+
+.warning {
+    color: red;
 }
 
 em {
@@ -869,7 +873,9 @@ pre code {
 
 code {
     font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+    color: #d72631;
 }
+
 
 
 
