@@ -54,7 +54,7 @@ ol, ul {
 
 body, html {
     height: 100%;
-    min-width: 550px;
+/*    min-width: 550px;*/
     
 }
 
@@ -112,9 +112,13 @@ body {
     margin-bottom: 40px;
 }
 
+@media screen and (max-width: 480px) {
+    .content ol li {
+        font-size: 0.85em;
+    }
+}
 /* Body main page */
-#main .wrapper .inner,
-#footer .wrapper .inner {
+#main .wrapper .inner {
     float: left;
     display: block;
     margin-left: 10%;
@@ -128,6 +132,8 @@ body {
 
 
 #footer .wrapper .inner {
+    float: left;
+    display: block;
     text-align: center;
     padding-top: 40px;
     margin-top: 60px;
@@ -145,10 +151,7 @@ body {
 }
 
 @media screen and (max-width: 768) {
-    #main .wrapper .inner,
-    #footer .wrapper .inner {
-        float: left;
-        display: block;
+    #main .wrapper .inner {
         width: 82.94039%;
         margin-left: 8.5%;
         margin-right: 2.35765%;
@@ -160,16 +163,30 @@ body {
     }
 }
 
+@media screen and (max-width: 480px) {
+    #footer .wrapper .inner p{
+        font-size: 0.8em;
+    }
+    
+    #footer #profile {
+        width: 100px;
+    }
+}
+
 /* whole page */
 #page {
     position: relative;
     min-height: 100%;
-    padding-bottom: 374px;
+/*    padding-bottom: 374px;*/
 }
 
 @media screen and (max-width: 1024px) {
-    #page {
-        padding-bottom: 474px;
+/*    #page {*/
+/*        padding-bottom: 474px;*/
+/*    }*/
+    
+    .description {
+        font-size: 1.2em;
     }
 }
 
@@ -210,11 +227,19 @@ body {
     
     #header .logo a {
         display: block;
+        font-size: 1em;
     }
     
-    #header .logo a img {
+    #header .logo img {
         margin: 30px auto 0;
         display: block;
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #header .logo img {
+        width: 95%
     }
 }
 
@@ -401,7 +426,14 @@ h1 {
 
 @media screen and (max-width: 768px) {
     h1 {
-        font-size: 50px;
+        font-size: 45px;
+        padding: 30px 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 30px;
         padding: 30px 0;
     }
 }
@@ -437,13 +469,13 @@ h2 {
 @media screen and (max-width: 768px) {
     h2 {
         font-size: 40px;
-        padding: 30px 0;
+        padding: 30px 0 15px 0;
     }
 }
 
 @media screen and (max-width: 480px) {
     h2 {
-        font-size: 26px;
+        font-size: 27px;
     }
 }
 
@@ -465,7 +497,7 @@ h3 {
 
 @media screen and (max-width: 480px) {
     h3 {
-        font-size: 26px;
+        font-size: 25px;
     }
 }
 
@@ -482,13 +514,13 @@ h4 {
 
 @media screen and (max-width: 768px) {
     h4 {
-        font-size: 20px;
+        font-size: 15px;
     }
 }
 
 @media screen and (max-width: 480px) {
     h4 {
-        font-size: 16px;
+        font-size: 10px;
     }
 }
 
@@ -512,6 +544,12 @@ p {
 
 p.description {
     text-align: center;
+}
+
+@media screen and (max-width: 480px) {
+    p, strong, p.description {
+        font-size: 0.85em;
+    }
 }
 
 .warning {
@@ -560,6 +598,13 @@ strong.alert {
     margin-right: 10px;
 }
 
+#sub-item-date {
+    padding: 0;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
 #item-date h3{
     margin-bottom: 10px;
     padding: 0px 10px 10px 0;
@@ -567,23 +612,32 @@ strong.alert {
     font-size: 0.9em;
 }
 
+@media screen and (max-width: 480px) {
+    #item-date {
+        padding: 0;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
+    
+    #sub-item-date {
+        opacity: 1;
+        width: auto;
+        height: 20px;
+    }
+    
+    #sub-item-date h3{
+        padding: 0px 10px 10px 0;
+        color: rgba(231,90,47,0.5);
+        font-size: 0.95em;
+        padding-top: 5px;
+    }
+}
+
 #item-thumbnail {
     width: 180px;
     height: auto;
     margin: 8px;
-}
-
-
-@media screen and (max-width: 480px) {
-    #item-header {
-        display: block;
-    }
-    
-    #item-date {
-        margin-bottom: 10px;
-        padding: 0;
-    }
-    
 }
 
 .item-list h1 {
@@ -614,6 +668,28 @@ strong.alert {
     display: grid;
     grid-template-columns: repeat(2,1fr);
 }
+@media screen and (max-width: 768px) {
+    .item-list h1 {
+        font-size: 1.2em;
+        margin-bottom: 5px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #item-header {
+        display: block;
+    }
+    
+    .item-list p {
+        font-size: 0.8em;
+    }
+    
+    .item-list h1 {
+        margin-bottom: 0;
+        font-size: 1em;
+    }
+    
+}
 
 /*
     Tag list
@@ -635,6 +711,12 @@ strong.alert {
     border-radius: 5px;
     margin-right: 8px;
     font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.tag {
+    font-size: 1em;
+    padding: 6px 6px 3px;
 }
 
 .all-tags .tag {
@@ -666,6 +748,29 @@ strong.alert {
 .browse-all {
     display: block;
     margin-bottom: 30px;
+    font-size: 1.2em;
+}
+
+@media screen and (max-width: 768) {
+    .browse-all {
+        font-size: 1em;
+        margin-bottom: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .tag-list {
+        margin-bottom: 4px;
+    }
+    
+    .tag-list li a {
+        font-size: 0.8em;
+    }
+    
+    .browse-all {
+        font-size: 0.85em;
+        margin-bottom: 10px;
+    }
 }
 
 /*
@@ -738,17 +843,17 @@ strong.alert {
     height: auto;
 }
 
-.content h1 {
-    font-size: 50px;
-}
-
-
-@media screen and (max-width: 768px) {
-    .content h1 {
-        font-size: 40px;
-        padding: 30px 0;
-    }
-}
+/*.content h1 {*/
+/*    font-size: 50px;*/
+/*}*/
+/**/
+/**/
+/*@media screen and (max-width: 768px) {*/
+/*    .content h1 {*/
+/*        font-size: 40px;*/
+/*        padding: 30px 0;*/
+/*    }*/
+/*}*/
 
 /* About Me */
 #aboutme {
@@ -771,6 +876,31 @@ strong.alert {
     width: -webkit-fill-available;
 }
 
+@media screen and (max-width: 768px) {
+    #aboutme-profile {
+        width: 200px;
+        height: 200px;
+        min-width: 200px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #aboutme {
+        width: -webkit-fill-available;
+        display: block;
+    }
+    
+    #aboutme-profile {
+        width: 130px;
+        height: 130px;
+        min-width: 130px;
+        float: left;
+        padding: 0;
+        margin: 10px;
+    }
+}
+
+
 /* Social Media */
 .social{
     display: inline-flex;
@@ -778,7 +908,7 @@ strong.alert {
 
 .social li{
     margin: 5px 20px 15px 0;
-    background-size: 28px 28px;
+    background-size: 30px;
     background-repeat: no-repeat;
     text-align: center;
     width: 30px;
@@ -801,24 +931,18 @@ strong.alert {
 
 .social .instagram {
     background-image: url("img/media/instagram_icon_gray.png");
-    background-size: 30px;
 }
 
 .social .youtube {
     background-image: url("img/media/youtube_icon_gray.png");
-    background-size: 33px 28px;
-    width: 33px;
+    background-size: 32px 30px;
+    width: 32px;
 }
 
 .social .email {
     background-image: url("img/media/email_icon_gray.png");
-    display: inline-flex;
-    background-size: 35px 28px;
-    width: auto;
-}
-
-.email p {
-    text-align: left;
+    background-size: 32px 28px;
+    width: 32px;
 }
 
 .social .github:hover,
@@ -846,9 +970,10 @@ strong.alert {
     background-image: url("img/media/email_icon_orange.png");
 }
 
-.testTitle {
-    color: green;
-    
+@media and (max-width: 480px) {
+    .social {
+        display: block;
+    }
 }
 
 /* Code Snipet styling */
@@ -876,7 +1001,28 @@ code {
     color: #d72631;
 }
 
+@media screen and (max-width: 480px) {
+    pre code, code, p code {
+        font-size: 0.85em;
+    }
+}
 
+/* Leetcode content */
+@media screen and (max-width: 768px) {
+    #leetcode-content h3 {
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #leetcode-content h3 {
+        font-size: 20px;
+    }
+    
+    #leetcode-content h1 {
+        font-size: 0.9em;
+    }
+}
 
 
 /* Code syntax */
