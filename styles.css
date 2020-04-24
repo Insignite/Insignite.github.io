@@ -114,7 +114,7 @@ body {
 
 @media screen and (max-width: 480px) {
     .content ol li {
-        font-size: 0.85em;
+        font-size: 0.95em;
     }
 }
 /* Body main page */
@@ -426,14 +426,14 @@ h1 {
 
 @media screen and (max-width: 768px) {
     h1 {
-        font-size: 45px;
+        font-size: 40px;
         padding: 30px 0;
     }
 }
 
 @media screen and (max-width: 480px) {
     h1 {
-        font-size: 30px;
+        font-size: 35px;
         padding: 30px 0;
     }
 }
@@ -469,13 +469,13 @@ h2 {
 @media screen and (max-width: 768px) {
     h2 {
         font-size: 40px;
-        padding: 30px 0 15px 0;
+        padding: 35px 0 15px 0;
     }
 }
 
 @media screen and (max-width: 480px) {
     h2 {
-        font-size: 27px;
+        font-size: 30px;
     }
 }
 
@@ -548,7 +548,7 @@ p.description {
 
 @media screen and (max-width: 480px) {
     p, strong, p.description {
-        font-size: 0.85em;
+        font-size: 0.95em;
     }
 }
 
@@ -841,6 +841,7 @@ strong.alert {
     width: 100%;
     display: block; /* NOTE: may not needed */
     height: auto;
+    margin: 10px 0 10px 0;
 }
 
 /*.content h1 {*/
@@ -1002,8 +1003,11 @@ code {
 }
 
 @media screen and (max-width: 480px) {
-    pre code, code, p code {
+    pre code {
         font-size: 0.85em;
+    }
+    code, p code {
+        font-size: 0.95em;
     }
 }
 
