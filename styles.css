@@ -148,6 +148,7 @@ body {
     padding-top: 40px;
     margin-top: 60px;
     border-top: 2px solid #4E5C6A;
+    margin-left: 10%;
 }
 
 #footer .wrapper .inner p{
@@ -650,11 +651,6 @@ strong.alert {
     }
 }
 
-#item-thumbnail {
-    width: 180px;
-    height: auto;
-    margin: 8px;
-}
 
 .item-list h1 {
     margin-bottom: 10px;
@@ -682,14 +678,30 @@ strong.alert {
     margin-bottom: 20px;
 }
 
-.grid {
+.grid, .grid-image {
     display: grid;
     grid-template-columns: repeat(2,1fr);
 }
+
+#item-thumbnail {
+    width: 580px;
+    height: auto;
+}
+
+@media screen and (max-width: 1024px) {
+    #item-thumbnail {
+        width: 420px;
+    }
+}
+
 @media screen and (max-width: 768px) {
     .item-list h1 {
         font-size: 1.2em;
         margin-bottom: 5px;
+    }
+    
+    #item-thumbnail {
+        width: 310px;
     }
 }
 
@@ -705,6 +717,14 @@ strong.alert {
     .item-list h1 {
         margin-bottom: 0;
         font-size: 1em;
+    }
+    
+    #item-thumbnail {
+        width: 300px;
+    }
+    
+    .grid-image {
+        grid-template-columns: repeat(1,1fr);
     }
     
 }
@@ -1125,6 +1145,23 @@ tr:nth-child(even) {
 .pagination.previous:hover {
     background-image: url("img/media/chevron_right_white.png");
 }
+
+@media screen and (max-width: 480px) {
+    .pagination {
+        background-size: 25px, 25px;
+        text-decoration: none;
+    }
+    
+    .pagination.previous, .pagination.next {
+        padding: 0 5px 0 5px;
+    }
+    
+    .pagination:hover {
+        width: 30px;
+        color: #00000000;
+    }
+}
+
 
 /* Code syntax */
 /**
