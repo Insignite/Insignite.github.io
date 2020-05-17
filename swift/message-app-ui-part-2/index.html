@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/swift/message-app-ui-part-2"/><meta name="twitter:url" content="https://justcodewithkhanh.com/swift/message-app-ui-part-2"/><meta name="og:url" content="https://justcodewithkhanh.com/swift/message-app-ui-part-2"/><title>Message App UI Part 2 | Just Code with Khanh</title><meta name="twitter:title" content="Message App UI Part 2 | Just Code with Khanh"/><meta name="og:title" content="Message App UI Part 2 | Just Code with Khanh"/><meta name="description" content="Building multiline textfield with scrollable content after line limit"/><meta name="twitter:description" content="Building multiline textfield with scrollable content after line limit"/><meta name="og:description" content="Building multiline textfield with scrollable content after line limit"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-swift"><a class="selected" href="/swift">Swift</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/axEIjePc2Ss" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Message App UI Part 2</strong></h1><p><strong><em>Currently work with Xcode 11.4, Swift 5</em></strong></p><p><strong><em>You can grab the full code at the bottom of the page</em></strong></p><p>Hi guy, welcome back to part 2 of this tutorial. For the first part, we finished making the UI with a reverse scroll view. This post I want to show you guys how to make a multiline text field that able to set a line limit to text before scrolling applies to your message. In the demo video, I will use code from the previous tutorial. However, this post view will not touch part 1 code at all. I simply will replace the text field from part 1 with a multiline text field.</p><p><strong><a href="https://justcodewithkhanh.com/swift/message-app-ui-part-1/">Part 1</a></strong> - iMessage UI page with navigation bar view and reverse scroll view.</p><p><strong>Part 2</strong> - Multiline text field with scrolling after message hit line limit.</p><h3><strong>Initialize Our UIViewRepresentable</strong></h3><p>As you know, the default text field in SwiftUI doesn't allow more than 1 line. If you type a long message, it will just continue a horizontal direction. To achieve this, we will tap into our old pal UITextView from UIKit and wrapped it in <code>UIViewRepresentable</code> to make it work in SwiftUI.</p><pre data-language="swift"><code><span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TextViewWrapper</span> : <span class="hljs-title">UIViewRepresentable</span> </span>{
+    <span class="hljs-comment">// 1</span>
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> text : <span class="hljs-type">String</span>
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> viewHeight: <span class="hljs-type">CGFloat</span>
+    <span class="hljs-keyword">var</span> placeHolder : <span class="hljs-type">String</span>
+    <span class="hljs-keyword">var</span> maxViewLine : <span class="hljs-type">CGFloat?</span> <span class="hljs-comment">// Allow us to set how tall the view is before scroll start</span>
+    <span class="hljs-keyword">var</span> onEditChange : (() -&gt; <span class="hljs-type">Void</span>)?
+    <span class="hljs-keyword">var</span> onDone : (() -&gt; <span class="hljs-type">Void</span>)?
+    
+    <span class="hljs-comment">// 2</span>
+    <span class="hljs-keyword">init</span>(text: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">String</span>&gt;, viewheight: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">CGFloat</span>&gt;, placeHolder: <span class="hljs-type">String</span>, maxViewLine: <span class="hljs-type">CGFloat?</span> = <span class="hljs-literal">nil</span>, onEditChange: (() -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>, onDone: (() -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>) {
+        <span class="hljs-keyword">self</span>._text = text
+        <span class="hljs-keyword">self</span>._viewHeight = viewheight
+        <span class="hljs-keyword">self</span>.placeHolder = placeHolder
+        <span class="hljs-keyword">self</span>.onEditChange = onEditChange
+        <span class="hljs-keyword">self</span>.onDone = onDone
+        <span class="hljs-keyword">self</span>.maxViewLine = maxViewLine
+    }
+    
+    <span class="hljs-comment">// 3</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeUIView</span><span class="hljs-params">(context: Context)</span></span> -&gt; <span class="hljs-type">UITextView</span> {
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateUIView</span><span class="hljs-params">(<span class="hljs-number">_</span> uiView: UITextView, context: Context)</span></span> {
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> Beside <code>maxViewLine</code>, a number that control of how many lines can your text field show, and <code>viewHeight</code>, a variable uses to set our text field size, the rest of the parameters is how default SwiftUI would have.</li><li>2.<code>//2</code> I don't believe init is needed due to default init the struct give unless you want to set a certain default value on our optional variables.</li><li>3.<code>//3</code> functions required by <code>UIViewRepresentable</code> protocol.</li></ol><h3><strong>Populate Our Required Functions</strong></h3><pre data-language="swift"><code><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeUIView</span><span class="hljs-params">(context: Context)</span></span> -&gt; <span class="hljs-type">UITextView</span> {
+   <span class="hljs-keyword">let</span> textView = <span class="hljs-type">UITextView</span>()
+   textView.isEditable = <span class="hljs-literal">true</span>
+   textView.isSelectable = <span class="hljs-literal">true</span>
+   textView.isScrollEnabled = <span class="hljs-literal">true</span>
+   textView.isUserInteractionEnabled = <span class="hljs-literal">true</span>
+   textView.backgroundColor = <span class="hljs-type">UIColor</span>.clear
+   textView.font = <span class="hljs-type">UIFont</span>.preferredFont(forTextStyle: .body)
+   textView.delegate = context.coordinator
+   textView.textColor = <span class="hljs-type">UIColor</span>.white <span class="hljs-comment">// I use white because dark theme contain black background</span>
+   <span class="hljs-keyword">return</span> textView
+}
+</code></pre><p>Here we will just initialize our <code>UITextView</code>. You can add more to your needs but don't change any of the variable set with true. Also be careful with the <code>font</code> because my height calculation function will only work well with <code>.body</code> text size. DON'T WORRY!!! You can use any font style, type, or size you like, but you just have to properly calculate it later on in the post.</p><pre data-language="swift"><code><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateUIView</span><span class="hljs-params">(<span class="hljs-number">_</span> uiView: UITextView, context: Context)</span></span> {
+    <span class="hljs-comment">// 1</span>
+   <span class="hljs-keyword">if</span> uiView.text != <span class="hljs-keyword">self</span>.text {
+      uiView.text = <span class="hljs-keyword">self</span>.text
+   }
+    <span class="hljs-comment">// 2</span>
+   <span class="hljs-keyword">let</span> predictedSize = uiView.sizeThatFits(<span class="hljs-type">CGSize</span>(width: uiView.frame.width, height: <span class="hljs-type">CGFloat</span>.greatestFiniteMagnitude))
+   <span class="hljs-comment">// 3</span>
+   <span class="hljs-keyword">let</span> lines = <span class="hljs-type">Self</span>.lineCalculator(uiView)
+   <span class="hljs-comment">// 4</span>
+   <span class="hljs-type">DispatchQueue</span>.main.async {
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.viewHeight != predictedSize.height &amp;&amp; lines &lt;= <span class="hljs-keyword">self</span>.maxViewLine! {
+          <span class="hljs-keyword">self</span>.viewHeight = predictedSize.height
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> lines &gt; <span class="hljs-keyword">self</span>.maxViewLine! {
+          <span class="hljs-keyword">self</span>.viewHeight = <span class="hljs-keyword">self</span>.maxViewLine! * uiView.font!.lineHeight
+      }
+   }
+}
+</code></pre><ol><li>1.<code>//1</code> When we change our <code>text</code> variable regardless the change is internal or external, such as reset text to empty after click sends button on a messenger app message field, I will manually set it.</li><li>2.<code>//2</code> Using <code>sizeThatFits</code> with unlimited height return the proper content size.</li><li>3.<code>//3</code> Here I want to calculate how many lines the text view is currently at.</li><li>4.<code>//4</code> Here I'm saying that if <code>predictedSize</code> height change, such as text going into the second line and expand up the text field, but I'm still under my limit line allow, then I set the height. Else, I'm using my line limit to set my view height.</li></ol><h3><strong>Line Calculation</strong></h3><pre data-language="swift"><code><span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">lineCalculator</span><span class="hljs-params">(<span class="hljs-number">_</span> textView: UITextView)</span></span> -&gt; <span class="hljs-type">CGFloat</span> {
+  <span class="hljs-keyword">let</span> preCalculateLines = (textView.contentSize.height - <span class="hljs-number">16</span>) / textView.font!.lineHeight
+  <span class="hljs-keyword">return</span> preCalculateLines.rounded(.down)
+}
+</code></pre><p>I will use my current content size and divide to font line height to get our total line number. The subtract <code>16</code> must use based on your case. Since my font is <code>.body</code>, the text view always start with height <code>38</code> then any line after that get add <code>22</code> to it. Here is the print demo:</p><pre data-language="undefined"><code>
+Line 1 - content size: 38 - lineHeight: 20.287109
+Line 2 - content size: 60 - lineHeight: 20.287109
+Line 3 - content size: 82 - lineHeight: 20.287109
+Line 4 - content size: 104 - lineHeight: 20.287109
+...
+</code></pre><p>This won't make sense if we just divide the content size to line-height without compensating for the extra <code>16</code> from the initial view. I want to also round down to get a perfect number.</p><h3><strong>Making The Coordinator</strong></h3><pre data-language="swift"><code><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeCoordinator</span><span class="hljs-params">()</span></span> -&gt; <span class="hljs-type">Coordinator</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-type">Coordinator</span>(text: $text, viewheight: $viewHeight, placeHolder: placeHolder, maxViewLine: maxViewLine, onEditChange: onEditChange, onDone: onDone)
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span> : <span class="hljs-title">NSObject</span>, <span class="hljs-title">UITextViewDelegate</span> </span>{
+  @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> text : <span class="hljs-type">String</span>
+  @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> viewHeight: <span class="hljs-type">CGFloat</span>
+  <span class="hljs-keyword">var</span> placeHolder : <span class="hljs-type">String</span>
+  <span class="hljs-keyword">var</span> maxViewLine : <span class="hljs-type">CGFloat?</span> <span class="hljs-comment">// Allow us to set how tall the view is before scroll start</span>
+  <span class="hljs-keyword">var</span> onEditChange : (() -&gt; <span class="hljs-type">Void</span>)?
+  <span class="hljs-keyword">var</span> onDone : (() -&gt; <span class="hljs-type">Void</span>)?
+  
+  <span class="hljs-keyword">init</span>(text: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">String</span>&gt;, viewheight: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">CGFloat</span>&gt;, placeHolder: <span class="hljs-type">String</span>, maxViewLine: <span class="hljs-type">CGFloat?</span> = <span class="hljs-literal">nil</span>, onEditChange: (() -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>, onDone: (() -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>) {
+      <span class="hljs-keyword">self</span>._text = text
+      <span class="hljs-keyword">self</span>._viewHeight = viewheight
+      <span class="hljs-keyword">self</span>.placeHolder = placeHolder
+      <span class="hljs-keyword">self</span>.onEditChange = onEditChange
+      <span class="hljs-keyword">self</span>.onDone = onDone
+      <span class="hljs-keyword">self</span>.maxViewLine = maxViewLine
+  }
+}
+</code></pre><p>Our coordinator must conform to <code>UITextViewDelegate</code> to let us access to text view functions. The init is pretty much the same from our <code>TextViewWrapper</code>.</p><pre data-language="swift"><code><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">textViewDidChange</span><span class="hljs-params">(<span class="hljs-number">_</span> textView: UITextView)</span></span> {
+    <span class="hljs-comment">// 1</span>
+   <span class="hljs-keyword">self</span>.text = textView.text
+   <span class="hljs-keyword">let</span> predictedSize = textView.sizeThatFits(<span class="hljs-type">CGSize</span>(width: textView.frame.width, height: <span class="hljs-type">CGFloat</span>.greatestFiniteMagnitude))
+   <span class="hljs-comment">// 2</span>
+   <span class="hljs-keyword">let</span> lines = <span class="hljs-type">TextViewWrapper</span>.lineCalculator(textView)
+   <span class="hljs-type">DispatchQueue</span>.main.async {
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.viewHeight != predictedSize.height &amp;&amp; lines &lt;= <span class="hljs-keyword">self</span>.maxViewLine! {
+          <span class="hljs-keyword">self</span>.viewHeight = predictedSize.height
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> lines &gt; <span class="hljs-keyword">self</span>.maxViewLine! {
+          <span class="hljs-keyword">self</span>.viewHeight = <span class="hljs-keyword">self</span>.maxViewLine! * uiView.font!.lineHeight
+      }
+   }
+}
+</code></pre><p>This function is almost exactly like our <code>updateUIView</code> function. But 2 code line that are different:</p><ol><li>1.<code>//1</code> We will update our text variable here.</li><li>2.<code>//2</code> Due to <code>lineCalculator</code> is a static function, we can access it through <code>TextViewWrapper</code> struct.</li></ol><p>Now you can go back to where we have text field implement from the part 1 and replace it with this or in case you didn't go through part 1, you can call the multiline textfield with this:</p><pre data-language="swift"><code><span class="hljs-comment">//  ZStack(alignment: .leading) {</span>
+<span class="hljs-comment">//      if self.currentMess.isEmpty {</span>
+<span class="hljs-comment">//          Text("Message").foregroundColor(.gray)</span>
+<span class="hljs-comment">//      }</span>
+<span class="hljs-comment">//      TextField("", text: self.$currentMess).foregroundColor(.white)</span>
+<span class="hljs-comment">//  }</span>
+<span class="hljs-type">MultilineText</span>(text: <span class="hljs-keyword">self</span>.$currentMess, placeHolder: <span class="hljs-string">"Message"</span>, maxViewLine: <span class="hljs-number">3</span>)
+</code></pre><p>Max's view line is optional. I set the default as 4 so here I override it with 3 to show you it works. You can remove the parameter if you would like.</p><h3><strong>Result</strong></h3><video width="250" height="500" controls>
+  <source src="/swift/message-app-ui-part-2/result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Thank you for reading. 🙇🏻‍♂️ You can download the code <a href="/swift/message-app-ui-part-2/MultilineTextField.swift" download>here</a></p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-f"><a href="/tags/swiftui">swiftui</a></li><li class="color-c"><a href="/tags/textfield">textfield</a></li><li class="color-f"><a href="/tags/message">message</a></li></ul></article></div></div><div><a class="pagination previous" href="/swift/message-app-ui-part-1">Message App UI Part 1</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></p><p>👨🏻‍💻 A Swift and SwiftUI fan. 📚</p><p>Copyright © Khanh N 2020. All rights reserved.</p><p>Generated using <a href="https://github.com/johnsundell/publish">Publish.</a></p></div></div></footer></body></html>
