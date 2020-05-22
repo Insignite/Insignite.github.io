@@ -1,0 +1,191 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/swift/fully-customizable-alert-system"/><meta name="twitter:url" content="https://justcodewithkhanh.com/swift/fully-customizable-alert-system"/><meta name="og:url" content="https://justcodewithkhanh.com/swift/fully-customizable-alert-system"/><title>Fully Customizable Alert System | Just Code with Khanh</title><meta name="twitter:title" content="Fully Customizable Alert System | Just Code with Khanh"/><meta name="og:title" content="Fully Customizable Alert System | Just Code with Khanh"/><meta name="description" content="replicating Apple alert system with full customization style"/><meta name="twitter:description" content="replicating Apple alert system with full customization style"/><meta name="og:description" content="replicating Apple alert system with full customization style"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-swift"><a class="selected" href="/swift">Swift</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/2EDJUMgoexA" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Fully Customizable Alert System</strong></h1><p>In my recent work, the default system alert wasn't working properly so I have to implement a custom alert. By backtracking the default alert system, I was able to create a custom alert that keeps the same structure yet allows you to style it to your need. So today, I want to share my method to you :)</p><h3><strong>Let's Get Started</strong></h3><pre data-language="swift"><code>.alert(isPresented: <span class="hljs-keyword">self</span>.$showAlert1) {
+    <span class="hljs-type">Alert</span>(title: <span class="hljs-type">Text</span>(<span class="hljs-string">"Error 1"</span>), dismissButton: .cancel())
+}
+</code></pre><p>As you can see, this is the default alert. We notice that <code>.alert</code> is some sort of <code>ViewModifier</code> and inside it is a custom <code>Alert</code> object. When you right-click on <code>Alert</code>, and press <code>Jump to Definition</code>, it will take you to an open template that Apple provided us. We were able to see all the initializer and structure of <code>Alert</code> object. So we will backtrack this whole structure to recreate our alert.</p><pre data-language="swift"><code><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Alert</span> </span>{
+
+    <span class="hljs-comment">/// Creates an alert with one button.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">init</span>(title: <span class="hljs-type">Text</span>, message: <span class="hljs-type">Text?</span> = <span class="hljs-literal">nil</span>, dismissButton: <span class="hljs-type">Alert</span>.<span class="hljs-type">Button?</span> = <span class="hljs-literal">nil</span>)
+
+    <span class="hljs-comment">/// Creates an alert with two buttons.</span>
+    <span class="hljs-comment">///</span>
+    <span class="hljs-comment">/// - Note: the system determines the visual ordering of the buttons.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">init</span>(title: <span class="hljs-type">Text</span>, message: <span class="hljs-type">Text?</span> = <span class="hljs-literal">nil</span>, primaryButton: <span class="hljs-type">Alert</span>.<span class="hljs-type">Button</span>, secondaryButton: <span class="hljs-type">Alert</span>.<span class="hljs-type">Button</span>)
+
+    <span class="hljs-comment">/// A button representing an operation of an alert presentation.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Button</span> </span>{
+
+        <span class="hljs-comment">/// Creates an `Alert.Button` with the default style.</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> `<span class="hljs-title">default</span>`<span class="hljs-params">(<span class="hljs-number">_</span> label: Text, action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = {}) -&gt; <span class="hljs-type">Alert</span>.<span class="hljs-type">Button</span>
+
+        <span class="hljs-comment">/// Creates an `Alert.Button` that indicates cancellation of some</span>
+        <span class="hljs-comment">/// operation.</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cancel</span><span class="hljs-params">(<span class="hljs-number">_</span> label: Text, action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = {}) -&gt; <span class="hljs-type">Alert</span>.<span class="hljs-type">Button</span>
+
+        <span class="hljs-comment">/// Creates an `Alert.Button` that indicates cancellation of some</span>
+        <span class="hljs-comment">/// operation.</span>
+        <span class="hljs-comment">///</span>
+        <span class="hljs-comment">/// - Note: the label of the button is automatically chosen by the</span>
+        <span class="hljs-comment">/// system for the appropriate locale.</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cancel</span><span class="hljs-params">(<span class="hljs-number">_</span> action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = {}) -&gt; <span class="hljs-type">Alert</span>.<span class="hljs-type">Button</span>
+
+        <span class="hljs-comment">/// Creates an `Alert.Button` with a style indicating destruction of</span>
+        <span class="hljs-comment">/// some data.</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">destructive</span><span class="hljs-params">(<span class="hljs-number">_</span> label: Text, action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = {}) -&gt; <span class="hljs-type">Alert</span>.<span class="hljs-type">Button</span>
+    }
+}
+</code></pre><p>If we take a look at this struct, we noticed that there is 2 <code>init</code> that passed in some parameters: <em>title, an optional message, dismissButton, primaryButton, and secondaryButton</em>. We can look at <em>dismissButton</em> the same as <em>primaryButton</em> so we can rule out variables to create.</p><p>Next is to copy this struct and place it in another file, which we will modify. I decided to call the copied struct as <code>CAlert</code> and add our missing variables.</p><pre data-language="swift"><code><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">CAlert</span> </span>{
+    <span class="hljs-keyword">var</span> title : <span class="hljs-type">Text</span>
+    <span class="hljs-keyword">var</span> message : <span class="hljs-type">Text?</span>
+    <span class="hljs-keyword">var</span> primaryButton : <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button?</span>
+    <span class="hljs-keyword">var</span> secondaryButton : <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button?</span>
+
+    <span class="hljs-comment">/// Creates an alert with one button.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">init</span>(title: <span class="hljs-type">Text</span>, message: <span class="hljs-type">Text?</span> = <span class="hljs-literal">nil</span>, dismissButton: <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button?</span> = <span class="hljs-literal">nil</span>) {
+        <span class="hljs-keyword">self</span>.title = title
+        <span class="hljs-keyword">self</span>.message = message
+        <span class="hljs-keyword">self</span>.primaryButton = dismissButton
+    }
+
+    <span class="hljs-comment">/// Creates an alert with two buttons.</span>
+    <span class="hljs-comment">///</span>
+    <span class="hljs-comment">/// - Note: the system determines the visual ordering of the buttons.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">init</span>(title: <span class="hljs-type">Text</span>, message: <span class="hljs-type">Text?</span> = <span class="hljs-literal">nil</span>, primaryButton: <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button</span>, secondaryButton: <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button</span>) {
+        <span class="hljs-keyword">self</span>.title = title
+        <span class="hljs-keyword">self</span>.message = message
+        <span class="hljs-keyword">self</span>.primaryButton = primaryButton
+        <span class="hljs-keyword">self</span>.secondaryButton = secondaryButton
+    }
+
+    <span class="hljs-comment">//...</span>
+    <span class="hljs-comment">// Button is here which we will look at later</span>
+}
+</code></pre><p>We match each variable to how it declared in the <code>init</code>. Also, we want to keep <code>primaryButton</code> and <code>secondaryButton</code> as optional because <code>dismissButton</code> is optional, and <code>secondaryButton</code> doesn't guarantee will be used. Also we want to match button type to <code>CAlert.Button</code>.</p><h4><strong>Building our buttons</strong></h4><pre data-language="swift"><code><span class="hljs-comment">/// A button representing an operation of an alert presentation.</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Button</span> </span>{
+    <span class="hljs-keyword">var</span> label : <span class="hljs-type">Text</span>
+    <span class="hljs-keyword">var</span> action : (() -&gt; <span class="hljs-type">Void</span>)?
+
+    <span class="hljs-comment">/// Creates an `Alert.Button` with the default style.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> `<span class="hljs-title">default</span>`<span class="hljs-params">(<span class="hljs-number">_</span> label: Text, action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>) -&gt; <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Button</span>(label: label, action: action)
+    }
+
+    <span class="hljs-comment">/// Creates an `Alert.Button` that indicates cancellation of some</span>
+    <span class="hljs-comment">/// operation.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cancel</span><span class="hljs-params">(<span class="hljs-number">_</span> label: Text, action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>) -&gt; <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Button</span>(label: label, action: action)
+    }
+
+    <span class="hljs-comment">/// Creates an `Alert.Button` that indicates cancellation of some</span>
+    <span class="hljs-comment">/// operation.</span>
+    <span class="hljs-comment">///</span>
+    <span class="hljs-comment">/// - Note: the label of the button is automatically chosen by the</span>
+    <span class="hljs-comment">/// system for the appropriate locale.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cancel</span><span class="hljs-params">(<span class="hljs-number">_</span> action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>) -&gt; <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Button</span>(label: <span class="hljs-type">Text</span>(<span class="hljs-string">"Cancel"</span>), action: action)
+    }
+
+    <span class="hljs-comment">/// Creates an `Alert.Button` with a style indicating destruction of</span>
+    <span class="hljs-comment">/// some data.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">destructive</span><span class="hljs-params">(<span class="hljs-number">_</span> label: Text, action: <span class="hljs-params">(<span class="hljs-params">()</span></span></span></span> -&gt; <span class="hljs-type">Void</span>)? = <span class="hljs-literal">nil</span>) -&gt; <span class="hljs-type">CAlert</span>.<span class="hljs-type">Button</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Button</span>(label: label.foregroundColor(.red), action: action)
+    }
+}
+</code></pre><p>Alrite. So for the button within the <code>CAlert</code> structure, we do the same as how we have done with <code>CAlert</code>. We observed what variable is passed and create it. There are 2 variables needed here: <em>label, and optional escape function called action</em>. In each function, we will return <code>Button</code> with these param passed in.</p><p>Notice how <code>cancel</code> function have no label variable, you would need to pass in a default text. And for <code>destructive</code> function, I want the text to be red to stand out the text.</p><h3><strong>Style And Build ViewModifier</strong></h3><p>Here is a simple <code>ViewModifier</code> that will hold our styling for the alert. Currently I put a simple text as a placeholder.</p><pre data-language="swift"><code><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">CAlertWrapper</span> : <span class="hljs-title">ViewModifier</span> </span>{
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> isPresented : <span class="hljs-type">Bool</span>
+    <span class="hljs-keyword">var</span> content : <span class="hljs-type">CAlert</span>
+    
+    <span class="hljs-keyword">init</span>(isPresented: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">Bool</span>&gt;, content : () -&gt; <span class="hljs-type">CAlert</span>) {
+        <span class="hljs-keyword">self</span>._isPresented = isPresented
+        <span class="hljs-keyword">self</span>.content = content()
+    }
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">body</span><span class="hljs-params">(content: Content)</span></span> -&gt; some <span class="hljs-type">View</span> {
+        <span class="hljs-type">Text</span>(<span class="hljs-string">""</span>)
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cAlert</span><span class="hljs-params">(isPresented : Binding&lt;Bool&gt;, content : <span class="hljs-params">()</span></span></span> -&gt; <span class="hljs-type">CAlert</span>) -&gt; some <span class="hljs-type">View</span> {
+        <span class="hljs-keyword">self</span>.modifier(<span class="hljs-type">CAlertWrapper</span>(isPresented: isPresented, content: content))
+    }
+}
+</code></pre><h4><strong>Style our alert</strong></h4><pre data-language="swift"><code><span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">body</span><span class="hljs-params">(content: Content)</span></span> -&gt; some <span class="hljs-type">View</span> {
+    <span class="hljs-type">ZStack</span> {
+        content.animation(.linear)
+        
+        <span class="hljs-keyword">if</span> isPresented {
+            <span class="hljs-type">Color</span>.black.opacity(<span class="hljs-number">0.4</span>).edgesIgnoringSafeArea(.all)
+            <span class="hljs-comment">// alert style here</span>
+        }
+    }
+}
+</code></pre><p>Alert able to show up on top of our home content through a z-stack. Also I want to apply a full black background on top of content to put the focus on the alert.</p><pre data-language="swift"><code><span class="hljs-comment">// alert</span>
+<span class="hljs-type">VStack</span> {
+    <span class="hljs-comment">// 1</span>
+    <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">10</span>) {
+        <span class="hljs-keyword">self</span>.content.title
+            .foregroundColor(.black)
+            .fontWeight(.semibold)
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.content.message != <span class="hljs-literal">nil</span> {
+            <span class="hljs-keyword">self</span>.content.message?.font(.footnote)
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-type">Text</span>(<span class="hljs-string">""</span>)
+        }
+    }.padding([.leading, .trailing, .top], <span class="hljs-number">15</span>)
+
+    <span class="hljs-comment">//2</span>
+    <span class="hljs-type">Spacer</span>(minLength: <span class="hljs-number">0</span>)
+    <span class="hljs-comment">// 3</span>
+    <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">0</span>) {
+        <span class="hljs-type">Divider</span>()
+        <span class="hljs-type">HStack</span> {
+            <span class="hljs-comment">// 4</span>
+            <span class="hljs-type">Button</span>(action: <span class="hljs-keyword">self</span>.content.primaryButton?.action != <span class="hljs-literal">nil</span> ?
+                (<span class="hljs-keyword">self</span>.content.primaryButton?.action)! :
+                {<span class="hljs-keyword">self</span>.isPresented = <span class="hljs-literal">false</span>}) {
+                <span class="hljs-type">HStack</span> {
+                    <span class="hljs-type">Spacer</span>()
+                    <span class="hljs-keyword">self</span>.content.primaryButton?.label ?? <span class="hljs-type">Text</span>(<span class="hljs-string">"Dismiss"</span>)
+                    <span class="hljs-type">Spacer</span>()
+                }
+            }
+            
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.content.secondaryButton != <span class="hljs-literal">nil</span> {
+                <span class="hljs-type">Divider</span>()
+                <span class="hljs-type">Button</span>(action: <span class="hljs-keyword">self</span>.content.secondaryButton?.action != <span class="hljs-literal">nil</span> ?
+                (<span class="hljs-keyword">self</span>.content.secondaryButton?.action)! :
+                    {<span class="hljs-keyword">self</span>.isPresented = <span class="hljs-literal">false</span>}) {
+                    <span class="hljs-type">HStack</span> {
+                        <span class="hljs-type">Spacer</span>()
+                        <span class="hljs-keyword">self</span>.content.secondaryButton!.label
+                        <span class="hljs-type">Spacer</span>()
+                    }
+                }
+            }
+        }.frame(height: <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.06</span>)
+    }
+}.animation(.linear)
+    .frame(width: <span class="hljs-type">Screen</span>.width * <span class="hljs-number">0.8</span>, height: <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.2</span>)
+.background(
+    <span class="hljs-type">RoundedRectangle</span>(cornerRadius: <span class="hljs-number">15</span>)
+        .foregroundColor(.white)
+)
+</code></pre><p>Place this right under your black background.</p><ol><li>1.<code>//1</code> I put the title and sub-message into a VStack and only put padding everywhere except <code>bottom</code> because the parent VStack already has spacing between our message and our button.</li><li>2.<code>//2</code> Spacer use to push bottom button to the bottom</li><li>3.<code>//3</code> Here we implement our button. There are two possible options: a primaryButton and a secondaryButton. <code>//4</code> I want to check if the button is empty or not. If it's empty, we put a default function to close out the alert; else we execute the function user passed in. The reason default variable for <code>action</code> in <code>Button</code> returns a <code>nil</code> instead of <code>{}</code> from default alert.</li></ol><h3><strong>Call It From Your View</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">var</span> showAlert = <span class="hljs-literal">false</span>
+    
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">Button</span>(action: {
+             <span class="hljs-keyword">self</span>.showAlert = <span class="hljs-literal">true</span>
+         }) {
+             <span class="hljs-type">Text</span>(<span class="hljs-string">"Show alert"</span>)
+         }.cAlert(isPresented: <span class="hljs-keyword">self</span>.$showAlert1) {
+            <span class="hljs-type">CAlert</span>(title: <span class="hljs-type">Text</span>(<span class="hljs-string">"Error"</span>), dismissButton: .cancel())
+        }
+    }
+}
+</code></pre><p>Here goes back to wherever you need to call your new custom alert and call it like how you would call a default alert.</p><h3><strong>Result</strong></h3><video width="250" height="500" controls>
+  <source src="/swift/fully-customizable-alert-system/result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Thank you for reading. 🙇🏻‍♂️ You can download the code <a href="/swift/fully-customizable-alert-system/CustomAlertSystem.swift" download>here</a></p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-b"><a href="/tags/swiftui">swiftui</a></li></ul></article></div></div><div><a class="pagination previous" href="/swift/message-app-ui-part-2">Message App UI Part 2</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></p><p>👨🏻‍💻 A Swift and SwiftUI fan. 📚</p><p>Copyright © Khanh N 2020. All rights reserved.</p><p>Generated using <a href="https://github.com/johnsundell/publish">Publish.</a></p></div></div></footer></body></html>
