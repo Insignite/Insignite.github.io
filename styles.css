@@ -702,10 +702,25 @@ strong.alert {
     position: relative;
 }
 
+.item-small-thumbnail {
+    margin-right: 20px;
+}
+
+.item-small-thumbnail img {
+    width: 160px;
+    height: 320px;
+    position: relative;
+}
+
 @media screen and (max-width: 1024px) {
     .item-thumbnail img {
-        width: 220px;
-        height: 440px;
+        width: 100px;
+        height: 200px;
+    }
+    
+    .item-small-thumbnail img {
+        width: 140px;
+        height: 280px;
     }
 }
 
@@ -715,11 +730,14 @@ strong.alert {
         margin-bottom: 5px;
     }
     
-
-    
     .item-thumbnail img {
         width: 180px;
         height: 360px;
+    }
+    
+    .item-small-thumbnail img {
+        width: 120px;
+        height: 240px;
     }
 }
 
@@ -740,6 +758,15 @@ strong.alert {
     .item-thumbnail img {
         width: 120px;
         height: 240px;
+    }
+    
+    .item-small-thumbnail {
+        margin-right: 10px;
+    }
+    
+    .item-small-thumbnail img {
+        width: 100px;
+        height: 200px;
     }
     
     .grid-image {

@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/swift/replacing-tabbar-with-customizable-tabbar"/><meta name="twitter:url" content="https://justcodewithkhanh.com/swift/replacing-tabbar-with-customizable-tabbar"/><meta name="og:url" content="https://justcodewithkhanh.com/swift/replacing-tabbar-with-customizable-tabbar"/><title>Replacing TabBar With Customizable TabBar | Just Code with Khanh</title><meta name="twitter:title" content="Replacing TabBar With Customizable TabBar | Just Code with Khanh"/><meta name="og:title" content="Replacing TabBar With Customizable TabBar | Just Code with Khanh"/><meta name="description" content="Replacing SwiftUI default tabBar with a customizable one"/><meta name="twitter:description" content="Replacing SwiftUI default tabBar with a customizable one"/><meta name="og:description" content="Replacing SwiftUI default tabBar with a customizable one"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-swift"><a class="selected" href="/swift">Swift</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/lQvFdmkrWV4" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Replacing TabBar With Customizable TabBar</strong></h1><p>As we progress with SwiftUI, one thing I noticed is the problem with the tab bar. It's insane how Apple provided limited or no customization to a view that widely used in almost every app. So today, we gonna completely get rid of it and create a custom one that allows users to change text color, bar color, remove that annoying 1px line border, and many more. The great thing about our custom tab bar is that the view doesn't get reset. For example, you scroll through a list of items and ended at item number 47 out of 800. You switched over to another tab to do something then switch back and still want to be at your last location. This tab bar will do the trick.</p><h3><strong>Making Our TabBar Wrapper</strong></h3><p>Since the default tab bar is just a wrapper to <code>UITabBarController</code>, we simply just have to make our own <code>UITabBarController</code>. we have known that SwiftUI uses <code>UIViewControllerRepresentable</code> to use UIKit components so we must wrap it.</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TabBarWrapper</span>: <span class="hljs-title">UIViewControllerRepresentable</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeUIViewController</span><span class="hljs-params">(context: Context)</span></span> -&gt; <span class="hljs-type">UITabBarController</span> {
+        <span class="hljs-keyword">let</span> tabBarVC = <span class="hljs-type">UITabBarController</span>()
+        <span class="hljs-keyword">return</span> tabBarVC
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateUIViewController</span><span class="hljs-params">(<span class="hljs-number">_</span> uiViewController: UITabBarController, context: Context)</span></span> {
+    }
+
+    <span class="hljs-keyword">typealias</span> <span class="hljs-type">UIViewControllerType</span> = <span class="hljs-type">UITabBarController</span>
+}
+</code></pre><p>Now we have a tab bar view, we going to add some customization to the tab bar with a separate function, then call it within <code>makeUIViewController(context)</code>.</p><pre data-language="swift"><code><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeUIViewController</span><span class="hljs-params">(context: Context)</span></span> -&gt; <span class="hljs-type">UITabBarController</span> {
+        <span class="hljs-comment">//...</span>
+        setUpTabBar(tabBarVC, context: context)
+        <span class="hljs-comment">//...</span>
+}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setUpTabBar</span><span class="hljs-params">(<span class="hljs-number">_</span> tabVC: UITabBarController, context: Context)</span></span> {
+    tabVC.viewControllers = <span class="hljs-keyword">self</span>.tabVC
+    tabVC.delegate = context.coordinator
+    tabVC.tabBar.tintColor = .black
+    tabVC.tabBar.isTranslucent = <span class="hljs-literal">false</span>
+    tabVC.tabBar.shadowImage = <span class="hljs-type">UIImage</span>()
+    tabVC.tabBar.backgroundImage = <span class="hljs-type">UIImage</span>()
+}
+</code></pre><p>Next, we connect a <code>UITabBarControllerDelegate</code> to <code>Coordinator</code> within our wrapper. Also, we going to use a binding <code>selection</code> variable passed from the parent. From the previous code section, there isn't any <code>selection</code> variable so we just have to initiate it in our parent struct.</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TabBarWrapper</span>: <span class="hljs-title">UIViewControllerRepresentable</span> </span>{
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> selection: <span class="hljs-type">Int</span>
+    
+    <span class="hljs-keyword">init</span>(selection: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">Int</span>&gt;) {
+        <span class="hljs-keyword">self</span>._selection = selection
+    }
+    <span class="hljs-comment">//...</span>
+    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeCoordinator</span><span class="hljs-params">()</span></span> -&gt; <span class="hljs-type">Coordinator</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Coordinator</span>(selection: $selection)
+    }
+    
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span>: <span class="hljs-title">NSObject</span>, <span class="hljs-title">UITabBarControllerDelegate</span> </span>{
+        @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> selection: <span class="hljs-type">Int</span>
+        
+        <span class="hljs-keyword">init</span>(selection: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">Int</span>&gt;) {
+            <span class="hljs-keyword">self</span>._selection = selection
+        }
+        
+        <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tabBarController</span><span class="hljs-params">(<span class="hljs-number">_</span> tabBarController: UITabBarController, didSelect viewController: UIViewController)</span></span> {
+            <span class="hljs-comment">// Do something here if want more custom</span>
+        }
+    }
+}
+</code></pre><h3><strong>Create Custom UITabBarItem</strong></h3><p>If we take a look at <code>UITabBarItem</code> initializer, we see this</p><pre data-language="swift"><code><span class="hljs-type">UITabBarItem</span>(title: <span class="hljs-type">String?</span>, image: <span class="hljs-type">UIImage?</span>, selectedImage: <span class="hljs-type">UIImage?</span>)
+</code></pre><p>And we must find a way to pass in our desired view with tab item as a single payload for our wrapper to handle. Within the wrapper class, add this struct</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TabBarWrapper</span>: <span class="hljs-title">UIViewControllerRepresentable</span> </span>{
+    <span class="hljs-comment">//...</span>
+
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TabItem</span> </span>{
+        <span class="hljs-keyword">var</span> item: <span class="hljs-type">UITabBarItem</span>
+        <span class="hljs-keyword">var</span> contentView: <span class="hljs-type">AnyView</span>
+        
+        <span class="hljs-keyword">init</span>&lt;<span class="hljs-type">T</span>:<span class="hljs-type">View</span>&gt;(item: <span class="hljs-type">UITabBarItem</span>, view contentView: <span class="hljs-type">T</span>) {
+            <span class="hljs-keyword">self</span>.item = item
+            <span class="hljs-keyword">self</span>.contentView = <span class="hljs-type">AnyView</span>(contentView)
+        }
+        
+        <span class="hljs-keyword">init</span>&lt;<span class="hljs-type">T</span>:<span class="hljs-type">View</span>&gt;(title: <span class="hljs-type">String?</span> = <span class="hljs-string">""</span>, image: <span class="hljs-type">UIImage?</span> = <span class="hljs-literal">nil</span>, selectedImage: <span class="hljs-type">UIImage?</span> = <span class="hljs-literal">nil</span>, view contentView: () -&gt; <span class="hljs-type">T</span>) {
+            <span class="hljs-keyword">let</span> item  = <span class="hljs-type">UITabBarItem</span>(title: title, image: image, selectedImage: selectedImage)
+            item.selectedImage = selectedImage
+            <span class="hljs-keyword">self</span>.<span class="hljs-keyword">init</span>(item: item, view: contentView())
+        }
+    }
+}
+</code></pre><p>The tab item is pretty straight forward. It contains 2 inits, which you can add more, to take it all needed params from <code>UITabBarItem</code> and our parent content. The reason that <code>contentView</code> must be type T is because <code>View</code> is also a generic type so we can't pass it as a parameter type. You can try it but XCode will complain and give an error.</p><p>From there, we fix up our wrapper init and connect all our item to our tab bar viewController</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TabBarWrapper</span>: <span class="hljs-title">UIViewControllerRepresentable</span> </span>{
+    <span class="hljs-comment">//...</span>
+    <span class="hljs-comment">// 1</span>
+    <span class="hljs-keyword">var</span> tabVC: [<span class="hljs-type">UIHostingController</span>&lt;<span class="hljs-type">AnyView</span>&gt;]
+    <span class="hljs-comment">// 2</span>
+    <span class="hljs-keyword">init</span>(selection: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">Int</span>&gt;, tabs tabVC: () -&gt; [<span class="hljs-type">TabItem</span>]) {
+        <span class="hljs-comment">//...</span>
+        <span class="hljs-keyword">self</span>.tabVC = tabVC().<span class="hljs-built_in">map</span> { item <span class="hljs-keyword">in</span>
+            <span class="hljs-keyword">let</span> hostVC = <span class="hljs-type">UIHostingController</span>(rootView: item.contentView)
+            hostVC.tabBarItem = item.item
+            <span class="hljs-keyword">return</span> hostVC
+        }
+    }
+    
+    <span class="hljs-comment">// 3</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateUIViewController</span><span class="hljs-params">(<span class="hljs-number">_</span> uiViewController: UITabBarController, context: Context)</span></span> {
+        uiViewController.selectedIndex = selection
+    }
+    
+    <span class="hljs-comment">// 4</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setUpTabBar</span><span class="hljs-params">(<span class="hljs-number">_</span> tabVC: UITabBarController, context: Context)</span></span> {
+        tabVC.viewControllers = <span class="hljs-keyword">self</span>.tabVC
+        <span class="hljs-comment">//...</span>
+    }
+    
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span>: <span class="hljs-title">NSObject</span>, <span class="hljs-title">UITabBarControllerDelegate</span> </span>{
+        <span class="hljs-comment">//...</span>
+        <span class="hljs-comment">// 5</span>
+        <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tabBarController</span><span class="hljs-params">(<span class="hljs-number">_</span> tabBarController: UITabBarController, didSelect viewController: UIViewController)</span></span> {
+            <span class="hljs-comment">// Do something here if want more custom</span>
+            <span class="hljs-keyword">self</span>.selection = tabBarController.selectedIndex
+            <span class="hljs-keyword">if</span> selection == <span class="hljs-number">1</span> {
+                tabBarController.tabBar.barTintColor = .red
+            } <span class="hljs-keyword">else</span> {
+                tabBarController.tabBar.barTintColor = .blue
+            }
+        }
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> For us to convert SwiftUI view to UIKit viewController, we need to use <code>UIHostingController</code>. Since it's a generic type, we must cast something such as <code>AnyView</code> to it. Tab bar items are just an array of <code>UIViewController</code> so that's how we are going declare it.</li><li>2.<code>//2</code> As for the init, we want an array of <code>TabItem</code> instead. This array will contain all information needed to declare a view and tabItem. Then we going to map every item in <code>tabVC</code> params to <code>tabVC</code>, while wrapping it in <code>UIHostingController</code> and declare <code>UITabBarItem</code>.</li><li>3.<code>//3</code> We updating our select item index here because <code>selection</code> variable gets update <code>//5</code> our delegate.</li><li>4.<code>//4</code> Connect our tabBar to all viewController.</li><li>4.<code>//5</code> I want to show that you can change tab bar color or anything related to tabBar during tab change.</li></ol><h3><strong>Testing The TabBar</strong></h3><p>In your <code>ContentView</code>, you can all ur tabBar like this</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> selection = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">TabBarWrapper</span>(selection: $selection) {
+            [<span class="hljs-type">TabBarWrapper</span>.<span class="hljs-type">TabItem</span>(title: <span class="hljs-string">"Contact"</span>, image: <span class="hljs-type">UIImage</span>(named: <span class="hljs-string">"people.double.active"</span>), selectedImage: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"book"</span>), view: { <span class="hljs-type">Text</span>(<span class="hljs-string">"Tab 1"</span>)},
+             <span class="hljs-type">TabBarWrapper</span>.<span class="hljs-type">TabItem</span>(title: <span class="hljs-string">"Profile"</span>, image: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"trash"</span>), selectedImage: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"book"</span>), view: { <span class="hljs-type">Text</span>(<span class="hljs-string">"Tab 1"</span>)})]
+        }.edgesIgnoringSafeArea(.bottom)
+    }
+}
+</code></pre><p>BUT...This isn't pretty. I can't imagine keeping calling <code>TabBarWrapper.TabItem</code> for every tab so let's make it better by creating a view extension.</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">extension</span> <span class="hljs-title">View</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tabItem</span><span class="hljs-params">(title: String?, image: UIImage? = <span class="hljs-literal">nil</span>, selectedImage: UIImage? = <span class="hljs-literal">nil</span>)</span></span> -&gt; <span class="hljs-type">TabBarWrapper</span>.<span class="hljs-type">TabItem</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-type">TabBarWrapper</span>.<span class="hljs-type">TabItem</span>(title: title, image: image, selectedImage: image) { <span class="hljs-keyword">self</span> }
+    }
+}
+</code></pre><p>Now you can call your tab like this instead.</p><pre data-language="swift"><code><span class="hljs-type">TabBarWrapper</span>(selection: $selection) {
+   [<span class="hljs-type">Text</span>(<span class="hljs-string">"Tab 1"</span>).tabItem(title: <span class="hljs-string">"Contact"</span>, image: <span class="hljs-type">UIImage</span>(named: <span class="hljs-string">"people.double.active"</span>), selectedImage: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"book"</span>)),
+    <span class="hljs-type">Text</span>(<span class="hljs-string">"Tab 2"</span>).tabItem(title: <span class="hljs-string">"Profile"</span>, image: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"trash"</span>), selectedImage: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"book"</span>))]
+}.edgesIgnoringSafeArea(.bottom)
+</code></pre><p>It still has a lot of params but looks much better. With some more modification, you probably can get rid of <code>[]</code> syntax as well. But I'll let you figure that out on your own.</p><h3><strong>Use in NavigationView</strong></h3><p>If you try to wrap your view in <code>NavigationView</code>, you ended with a gray bar right bottom at your view. You can see it in your preview and debug the view hierarchy. For some weird reason, SwiftUI <code>NavigationView</code> acted this way so we must use <code>UINavigationController</code> instead. However, it must be annoying if we making another <code>UIViewControllerRepresentable</code> just to wrap our view in it so we will wrap it directly within <code>TabBarWrapper</code>.</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">mTabBarWrapper</span>: <span class="hljs-title">UIViewControllerRepresentable</span> </span>{
+    <span class="hljs-comment">//...</span>
+    <span class="hljs-keyword">var</span> tabVC: [<span class="hljs-type">UINavigationController</span>] <span class="hljs-comment">// 1</span>
+    
+    <span class="hljs-keyword">init</span>(selection: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">Int</span>&gt;, tabs tabVC: () -&gt; [<span class="hljs-type">TabItem</span>]) {
+        <span class="hljs-comment">//...</span>
+        <span class="hljs-keyword">self</span>.tabVC = tabVC().<span class="hljs-built_in">map</span> { item <span class="hljs-keyword">in</span>
+            <span class="hljs-comment">//...</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-type">UINavigationController</span>(rootViewController: hostVC) <span class="hljs-comment">// 2</span>
+        }
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> Instead of <code>UIHostingViewController</code>, change it to <code>UINavigationController</code>.</li><li>2.<code>//2</code> Then simply wrap our <code>hostVC</code> in our init with navigation container.</li></ol><p>Now you can test your <code>ContentView</code> with this code</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> selection = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">TabBarWrapper</span>(selection: $selection) {
+            [<span class="hljs-type">Content1</span>().tabItem(title: <span class="hljs-string">"Contact"</span>, image: <span class="hljs-type">UIImage</span>(named: <span class="hljs-string">"people.double.active"</span>), selectedImage: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"book"</span>)),
+             <span class="hljs-type">Content2</span>().tabItem(title: <span class="hljs-string">"Profile"</span>, image: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"trash"</span>), selectedImage: <span class="hljs-type">UIImage</span>(systemName: <span class="hljs-string">"book"</span>))]
+        }.edgesIgnoringSafeArea([.bottom, .top])
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Content1</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">NavigationLink</span>(destination: <span class="hljs-type">Content3</span>()) {
+            <span class="hljs-type">Text</span>(<span class="hljs-string">"Hello"</span>)
+        }
+        .navigationBarTitle(<span class="hljs-string">"Contact"</span>)
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Content2</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">Text</span>(<span class="hljs-string">"World"</span>)
+        .navigationBarTitle(<span class="hljs-string">"Profile"</span>)
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Content3</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">Environment</span>(\.presentationMode) <span class="hljs-keyword">var</span> presentationMode: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">PresentationMode</span>&gt;
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">List</span>{
+            <span class="hljs-type">ForEach</span>((<span class="hljs-number">0</span>..&lt;<span class="hljs-number">50</span>).<span class="hljs-built_in">indices</span>) {
+                <span class="hljs-type">Text</span>(<span class="hljs-string">"\($0)"</span>)
+            }
+        }.navigationBarTitle(<span class="hljs-string">"List"</span>)
+        .navigationBarItems(leading:
+            <span class="hljs-type">Button</span>(action: {
+                <span class="hljs-keyword">self</span>.presentationMode.wrappedValue.dismiss()
+            }) {
+                <span class="hljs-type">Image</span>(systemName: <span class="hljs-string">"arrow.left"</span>)
+            }
+        )
+    }
+}
+</code></pre><h3><strong>Result</strong></h3><video width="250" height="500" controls>
+  <source src="/swift/replacing-tabbar-with-customizable-tabbar/result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Thank you for reading. 🙇🏻‍♂️ You can download the code <a href="/swift/replacing-tabbar-with-customizable-tabbar/CustomTabBar.swift" download>here</a></p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-a"><a href="/tags/swiftui">swiftui</a></li><li class="color-a"><a href="/tags/swift">swift</a></li></ul></article></div></div><div><a class="pagination previous" href="/swift/custom-search-bar-with-active-searching">Custom Search Bar With Active Searching</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></p><p>👨🏻‍💻 A Swift and SwiftUI fan. 📚</p><p>Copyright © Khanh N 2020. All rights reserved.</p><p>Generated using <a href="https://github.com/johnsundell/publish">Publish.</a></p></div></div></footer></body></html>
