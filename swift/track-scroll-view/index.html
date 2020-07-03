@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/swift/track-scroll-view"/><meta name="twitter:url" content="https://justcodewithkhanh.com/swift/track-scroll-view"/><meta name="og:url" content="https://justcodewithkhanh.com/swift/track-scroll-view"/><title>Custom Trackable ScrollView in SwiftUI | Just Code with Khanh</title><meta name="twitter:title" content="Custom Trackable ScrollView in SwiftUI | Just Code with Khanh"/><meta name="og:title" content="Custom Trackable ScrollView in SwiftUI | Just Code with Khanh"/><meta name="description" content="A custom scroll with accessible content offset"/><meta name="twitter:description" content="A custom scroll with accessible content offset"/><meta name="og:description" content="A custom scroll with accessible content offset"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-swift"><a class="selected" href="/swift">Swift</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-project"><a href="/project">Project</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/vuFUX1Qwrmo" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Custom Trackable ScrollView in SwiftUI</strong></h1><p>In SwiftUI, <code>ScrollView</code> is probably one of the most useful views, but it always lacking many features, especially the offset of how much content has scrolled. On top of that, the view gets refresh every time we switch tab or navigate to another view so the user would lose their scroll location. Would it be great if we have access to scroll offset and able to save it for later use or perform some custom animation based on how much the user has scrolled? Today, we going to create a scroll view that allows us just that; access to content offset.</p><h3><strong>Start With Initializer</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TrackScrollView</span>&lt;<span class="hljs-title">Content</span>:<span class="hljs-title">View</span>&gt;: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">let</span> axes: <span class="hljs-type">Axis</span>.<span class="hljs-type">Set</span>
+    <span class="hljs-keyword">let</span> showIndicators: <span class="hljs-type">Bool</span>
+    <span class="hljs-keyword">let</span> content: <span class="hljs-type">Content</span>
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> offset: <span class="hljs-type">CGFloat</span>
+    
+    <span class="hljs-keyword">init</span>(<span class="hljs-number">_</span> axes: <span class="hljs-type">Axis</span>.<span class="hljs-type">Set</span> = .vertical, showIndicators: <span class="hljs-type">Bool</span> = <span class="hljs-literal">true</span>, offset: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">CGFloat</span>&gt;, @<span class="hljs-type">ViewBuilder</span> content: () -&gt; <span class="hljs-type">Content</span>) {
+        <span class="hljs-keyword">self</span>.axes = axes
+        <span class="hljs-keyword">self</span>.showIndicators = showIndicators
+        <span class="hljs-keyword">self</span>._offset = offset
+        <span class="hljs-keyword">self</span>.content = content()
+    }
+}
+</code></pre><p><code>ScrollView</code> typically consists of the scroll axis, show scroll bar, and the content. We going to introduce another variable, which is a <code>@Binding</code> type of <code>CGFLoat</code> called <code>offset</code>. This variable is passed from the parent so they have access to the variable.</p><h3><strong>Build The Body</strong></h3><pre data-language="swift"><code><span class="hljs-comment">// Inside TrackScrollView</span>
+
+<span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+    <span class="hljs-type">GeometryReader</span> { outReader <span class="hljs-keyword">in</span>
+        <span class="hljs-type">ScrollView</span>(<span class="hljs-keyword">self</span>.axes, showsIndicators: <span class="hljs-keyword">self</span>.showIndicators) {
+            <span class="hljs-type">ZStack</span>(alignment: .top) {
+                <span class="hljs-type">GeometryReader</span> { inReader <span class="hljs-keyword">in</span>
+                    <span class="hljs-type">Color</span>.clear
+                }
+                <span class="hljs-type">VStack</span> { <span class="hljs-keyword">self</span>.content }
+            }
+        }
+    }
+}
+</code></pre><p>The reason we have 2 <code>GeometryReader</code> is to get the difference between them which results in our content offset. Also, we need something to act as a physical frame for us to get the size of our <code>inReader</code> and <code>Color.clear</code> is the perfect view to perform that role. It will we completely invisible to the user but very useful to us as developers.</p><h3><strong>Create PreferenceKey</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ScrollViewPreferenceKey</span>: <span class="hljs-title">PreferenceKey</span> </span>{
+    <span class="hljs-keyword">typealias</span> <span class="hljs-type">Value</span> = [<span class="hljs-type">CGFloat</span>]
+    
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">var</span> defaultValue: [<span class="hljs-type">CGFloat</span>] = [.zero]
+    
+    <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">reduce</span><span class="hljs-params">(value: <span class="hljs-keyword">inout</span> [CGFloat], nextValue: <span class="hljs-params">()</span></span></span> -&gt; [<span class="hljs-type">CGFloat</span>]) {
+        value.append(contentsOf: nextValue())
+    }
+}
+</code></pre><p>We will be using <code>PreferenceKey</code> to pass data from the child to the parent. We want to provide <code>typealias</code> as the key-value type, then the <code>defaultValue</code> for fall back. Next, we just need to append a set of <code>nextValue</code> to the current value array.</p><h3><strong>Add PreferenceKey to View</strong></h3><pre data-language="swift"><code><span class="hljs-type">ScrollView</span>(<span class="hljs-keyword">self</span>.axes, showsIndicators: <span class="hljs-keyword">self</span>.showIndicators) {
+    <span class="hljs-type">ZStack</span>(alignment: <span class="hljs-keyword">self</span>.axes == .vertical ? .top : .leading) {
+        <span class="hljs-type">GeometryReader</span> { inReader <span class="hljs-keyword">in</span>
+            <span class="hljs-type">Color</span>.clear.preference(key: <span class="hljs-type">ScrollViewPreferenceKey</span>.<span class="hljs-keyword">self</span>, value: <span class="hljs-keyword">self</span>.handleCalculateOffset(outterProxy: outReader, innerProxy: inReader))
+        }
+        <span class="hljs-comment">// ...</span>
+    }
+}.onPreferenceChange(<span class="hljs-type">ScrollViewPreferenceKey</span>.<span class="hljs-keyword">self</span>) { value <span class="hljs-keyword">in</span>
+    <span class="hljs-keyword">self</span>.offset = value[<span class="hljs-number">0</span>]
+}
+</code></pre><p>Going back to <code>TrackScrollView</code>, we want to add preference key to <code>Color.clear</code> with <code>.preference(key:,value:)</code>. This is where we will handle calculation for the offset. Then we want to update out <code>offset</code> variable with <code>.onPreferenceChange(key:, perform:)</code>. We don't need to check if <code>value</code> array exists or not empty because <code>PreferenceKey</code> always has a default value to fall back. In the worse case, our <code>offset</code> will be 0.</p><pre data-language="swift"><code><span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handleCalculateOffset</span><span class="hljs-params">(outterProxy: GeometryProxy, innerProxy: GeometryProxy)</span></span> -&gt; [<span class="hljs-type">CGFloat</span>] {
+    <span class="hljs-keyword">return</span> [outterProxy.frame(<span class="hljs-keyword">in</span>: .global).minY - innerProxy.frame(<span class="hljs-keyword">in</span>: .global).minY]
+}
+</code></pre><p>We want to extract the calculation to a separate function to keep our code clean. This function simply returns an <code>[CGFloat]</code> like our preference key <code>Value</code>. We want to take the frame of outter reader and inner reader, then find the difference between them with their <code>minY</code> value.</p><h3><strong>Test Our New ScrollView</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> offset: <span class="hljs-type">CGFloat</span> = .zero
+    
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">VStack</span> {
+            <span class="hljs-type">Text</span>(<span class="hljs-string">"\(offset)"</span>)
+            
+            <span class="hljs-type">TrackScrollView</span>(offset: $offset) {
+                <span class="hljs-type">ForEach</span>(<span class="hljs-number">0</span>..&lt;<span class="hljs-number">50</span>) {
+                    <span class="hljs-type">Text</span>(<span class="hljs-string">"\($0)"</span>)
+                }
+            }
+        }
+    }
+}
+</code></pre><p>In our <code>ContentView</code>, we going to make a text to show how much we scroll and our new <code>TrackScrollView</code> with a text of 50 items. It should work as we expected but this will only work for a vertical scroll view. Let's adapt it for a horizontal scroll view as well.</p><h3><strong>Adapt For Horizontal ScrollView</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">TrackScrollView</span>&lt;<span class="hljs-title">Content</span>:<span class="hljs-title">View</span>&gt;: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-comment">// ...</span>
+    
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">GeometryReader</span> { outReader <span class="hljs-keyword">in</span>
+            <span class="hljs-type">ScrollView</span>(<span class="hljs-keyword">self</span>.axes, showsIndicators: <span class="hljs-keyword">self</span>.showIndicators) {
+                <span class="hljs-type">ZStack</span>(alignment: <span class="hljs-keyword">self</span>.axes == .vertical ? .top : .leading) { <span class="hljs-comment">// 1</span>
+                    
+                    <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.axes == .vertical { <span class="hljs-comment">// 2</span>
+                        <span class="hljs-type">VStack</span> { <span class="hljs-keyword">self</span>.content }
+                    } <span class="hljs-keyword">else</span> { <span class="hljs-type">HStack</span> { <span class="hljs-keyword">self</span>.content }}
+                    
+                }
+            }
+        }
+    }
+}
+</code></pre><p>Adapting to the horizontal is very simple.</p><ol><li>1.Change <code>ZStack</code> alignment to be <code>.leading</code> if horizontal and keep <code>.top</code> if vertical.</li><li>2.Horizontal scroll required an <code>HStack</code> while vertical is a <code>VStack</code></li></ol><pre data-language="swift"><code> <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handleCalculateOffset</span><span class="hljs-params">(outterProxy: GeometryProxy, innerProxy: GeometryProxy)</span></span> -&gt; [<span class="hljs-type">CGFloat</span>] {
+     <span class="hljs-keyword">return</span> <span class="hljs-keyword">self</span>.axes == .vertical ? [outterProxy.frame(<span class="hljs-keyword">in</span>: .global).minY - innerProxy.frame(<span class="hljs-keyword">in</span>: .global).minY] :
+     [outterProxy.frame(<span class="hljs-keyword">in</span>: .global).minX - innerProxy.frame(<span class="hljs-keyword">in</span>: .global).minX]
+ }
+</code></pre><p>We also want to update our calculation function to use <code>minX</code> for horizontal and <code>minY</code> for vertical. We now have a scroll view that works for both horizontal and vertical.</p><h3><strong>Result</strong></h3><video width="250" height="500" controls>
+  <source src="/swift/track-scroll-view/result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Thank you for reading. 🙇🏻‍♂️ You can download the code <a href="/swift/track-scroll-view/TrackScrollView.swift" download>here</a></p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-e"><a href="/tags/swiftui">swiftui</a></li></ul></article></div></div><div><a class="pagination previous" href="/swift/wwdc20-what-new-in-swiftui-v2">WWDC 2020: What's new in SwiftUI?</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><a href="/aboutMe"><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></a></p><p>👨🏻‍💻 A Swift fan. 📚</p><p>Copyright © Khanh Nguyen 2020.</p><p>Powered by <a href="https://github.com/johnsundell/publish">Publish.</a></p></div></div></footer></body></html>
