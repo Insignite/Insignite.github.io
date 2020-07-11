@@ -61,7 +61,7 @@ body, html {
 
 body {
     padding: 0;
-    background-image: url("img/logo_low_opacity_background.png");
+/*    background-image: url("img/logo_low_opacity_background.png");*/
     background-position: center;
     background-color: #071426;
     background-repeat: no-repeat;
