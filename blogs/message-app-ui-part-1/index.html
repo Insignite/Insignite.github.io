@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/blogs/message-app-ui-part-1"/><meta name="twitter:url" content="https://justcodewithkhanh.com/blogs/message-app-ui-part-1"/><meta name="og:url" content="https://justcodewithkhanh.com/blogs/message-app-ui-part-1"/><title>Message App UI Part 1 | Just Code with Khanh</title><meta name="twitter:title" content="Message App UI Part 1 | Just Code with Khanh"/><meta name="og:title" content="Message App UI Part 1 | Just Code with Khanh"/><meta name="description" content="Building iMessage message page UI with custom reverse scroll view"/><meta name="twitter:description" content="Building iMessage message page UI with custom reverse scroll view"/><meta name="og:description" content="Building iMessage message page UI with custom reverse scroll view"/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-blogs"><a class="selected" href="/blogs">Blogs</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-project"><a href="/project">Project</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/_6N7RDCetSo" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Message App UI Part 1</strong></h1><p><strong><em>Currently work with Xcode 11.4, Swift 5</em></strong></p><p><strong><em>You can grab the full code at the bottom of the page</em></strong></p><p>I recently have to implement a message function in my current project. And with many messaging apps, all the chat bubble starts from the bottom scrolling up. I came to notice that there is no such thing as a reverse scroll view in SwiftUI. So I was digging around and came across <a href="https://www.process-one.net/blog/writing-a-custom-scroll-view-with-swiftui-in-a-chat-application/">this</a> tutorial that helped me build a reverse scroll view. After a few hours of playing around with it, I finally able to modified it to fit my need so let's build our chat application. I intend this to be a 2 part tutorial that helps you to build a messaging app. For simplicity, I will use iMessage UI.</p><p><strong>Part 1</strong> - iMessage UI page with navigation bar view and reverse scroll view.</p><p><strong><a href="https://justcodewithkhanh.com/blogs/message-app-ui-part-2/">Part 2</a></strong> - Multiline text field with scrolling after message hit line limit.</p><h3><strong>Preparing Data</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-comment">// 1</span>
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> messages : [<span class="hljs-type">Message</span>] = [
+        <span class="hljs-type">Message</span>(uid: <span class="hljs-string">"2"</span>, message: <span class="hljs-string">"Hello. This is first text"</span>),
+        <span class="hljs-type">Message</span>(uid: <span class="hljs-string">"2"</span>, message: <span class="hljs-string">"Hey got my txt?"</span>),
+        <span class="hljs-type">Message</span>(uid: <span class="hljs-string">"1"</span>, message: <span class="hljs-string">"I got your first txt"</span>),
+        <span class="hljs-type">Message</span>(uid: <span class="hljs-string">"2"</span>, message: <span class="hljs-string">"Gotcha"</span>)]
+    
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span> {
+            <span class="hljs-type">Color</span>.black
+        }
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView_Previews</span> : <span class="hljs-title">PreviewProvider</span> </span>{
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">var</span> previews : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ContentView</span>()
+    }
+}
+
+<span class="hljs-comment">// 2 Item for data</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Message</span> : <span class="hljs-title">Identifiable</span>, <span class="hljs-title">Hashable</span> </span>{
+    <span class="hljs-keyword">var</span> id = <span class="hljs-type">UUID</span>()
+    <span class="hljs-keyword">let</span> uid : <span class="hljs-type">String</span>
+    <span class="hljs-keyword">let</span> message : <span class="hljs-type">String</span>
+}
+
+<span class="hljs-comment">// 3 Get Screen size</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Screen</span> </span>{
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">let</span> height = <span class="hljs-type">UIScreen</span>.main.bounds.height
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">let</span> width = <span class="hljs-type">UIScreen</span>.main.bounds.width
+}
+</code></pre><p>Same as always, I will have my favorite <code>Screen</code> struct and some prepared data to save you some trouble. I also created a struct in the content view where the user with <code>uid</code> 1 will be you and <code>uid</code> 2 will be the person you are speaking with. I want this to be a dark theme so I'm using a black background.</p><h3><strong>Building The Main View</strong></h3><p>In this section, I will build our navigation bar view and the message box.</p><h4><strong>Navigation Bar View</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-comment">// 1</span>
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> currentMess = <span class="hljs-string">""</span>
+    
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span> {
+            <span class="hljs-type">Color</span>.black
+            <span class="hljs-comment">// 3</span>
+            <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">0</span>) {
+                <span class="hljs-type">NavigationBar</span>
+            }
+        }
+    }
+
+    <span class="hljs-comment">// 2</span>
+    <span class="hljs-keyword">var</span> <span class="hljs-type">NavigationBar</span> : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span>(alignment: .bottom) {
+            <span class="hljs-type">Rectangle</span>()
+                .foregroundColor(<span class="hljs-type">Color</span>.black)
+            <span class="hljs-type">HStack</span> {
+                <span class="hljs-type">Button</span>(action: {
+                    
+                }) {
+                    <span class="hljs-type">Image</span>(systemName: <span class="hljs-string">"chevron.left"</span>)
+                }
+                <span class="hljs-type">Spacer</span>()
+                <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">0</span>) {
+                    <span class="hljs-type">Image</span>(<span class="hljs-string">"avatar"</span>)
+                        .resizable()
+                        .frame(width: <span class="hljs-number">40</span>, height: <span class="hljs-number">40</span>)
+                    <span class="hljs-type">Text</span>(<span class="hljs-string">"JCWKhanh"</span>).font(.caption).foregroundColor(.white)
+                }
+                <span class="hljs-type">Spacer</span>()
+            }.padding()
+            .frame(height: <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.075</span>)
+        }.frame(height: <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.12</span>)
+    }
+}
+</code></pre><p>My navigation bar consists of a button allow to dismiss view, which will do nothing in the tutorial, and a <code>VStack</code> of a Memoji and receiver name.</p><h4><strong>Text Bar View</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span> {
+            <span class="hljs-type">Color</span>.black
+            <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">0</span>) {
+                <span class="hljs-comment">// 4</span>
+                <span class="hljs-type">TextBarView</span>
+            }
+        }
+    }
+    <span class="hljs-comment">// 1</span>
+    <span class="hljs-keyword">var</span> <span class="hljs-type">TextBarView</span> : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">HStack</span> {
+            <span class="hljs-comment">// 2</span>
+            <span class="hljs-type">ZStack</span>(alignment: .leading) {
+                <span class="hljs-keyword">if</span> <span class="hljs-keyword">self</span>.currentMess.isEmpty {
+                    <span class="hljs-type">Text</span>(<span class="hljs-string">"Message"</span>).foregroundColor(.gray)
+                }
+                <span class="hljs-type">TextField</span>(<span class="hljs-string">""</span>, text: <span class="hljs-keyword">self</span>.$currentMess).foregroundColor(.white)
+            }
+            <span class="hljs-comment">// 3</span>
+            <span class="hljs-type">Button</span>(action: {
+                <span class="hljs-keyword">self</span>.messages.append(<span class="hljs-type">Message</span>(uid: <span class="hljs-string">"1"</span>, message: <span class="hljs-keyword">self</span>.currentMess))
+                <span class="hljs-keyword">self</span>.currentMess = <span class="hljs-string">""</span>
+            }) {
+                <span class="hljs-type">Image</span>(systemName: <span class="hljs-string">"arrow.up"</span>)
+                    .foregroundColor(<span class="hljs-keyword">self</span>.currentMess.isEmpty ? .black : .white)
+                .background(
+                    <span class="hljs-type">Circle</span>()
+                        .frame(width: <span class="hljs-number">25</span>, height: <span class="hljs-number">25</span>)
+                        .foregroundColor(<span class="hljs-keyword">self</span>.currentMess.isEmpty ? <span class="hljs-type">Color</span>.gray : <span class="hljs-type">Color</span>(<span class="hljs-type">UIColor</span>.systemBlue))
+                )
+            }.disabled(<span class="hljs-keyword">self</span>.currentMess.isEmpty ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>)
+        }.padding([.trailing, .leading], <span class="hljs-number">10</span>)
+        .padding(<span class="hljs-number">5</span>)
+        .background(
+            <span class="hljs-type">RoundedRectangle</span>(cornerRadius: <span class="hljs-number">20</span>).stroke()
+                .foregroundColor(.gray)
+        ).frame(width: <span class="hljs-type">Screen</span>.width * <span class="hljs-number">0.95</span>)
+    }
+}
+</code></pre><ol><li>1.<code>//2</code> I'm putting the text field in <code>ZStack</code> because I can't change the TextField placeholder so I place custom text over it. The text will disappear when <code>currentMess</code> variable isn't empty allows the TextField to start populating.</li><li>2.<code>//3</code> Button action is to append to our messages list and clear up the <code>currentMess</code> text. I also change color and disabled the button unless you have some message in the message box.</li><li>3.<code>//4</code> Adding it right under <code>NavigationBar</code></li></ol><h3><strong>The Magical Reverse Scroll View</strong></h3><p>To make this scroll view, you must understand 2 key feature of SwiftUI:</p><ol><li>1.GeometryReader: return a frame that allows you to access content size.</li><li>2.Preference: Use to pass information from the child up to the parent view.</li></ol><h4><strong>Making The Body</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ReverseScrollView</span>&lt;<span class="hljs-title">Content</span>: <span class="hljs-title">View</span>&gt; : <span class="hljs-title">View</span> </span>{
+    <span class="hljs-comment">// 1</span>
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> contentHeight: <span class="hljs-type">CGFloat</span> = <span class="hljs-type">CGFloat</span>.zero
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> scrollOffset: <span class="hljs-type">CGFloat</span> = <span class="hljs-type">CGFloat</span>.zero
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> currentOffset: <span class="hljs-type">CGFloat</span> = <span class="hljs-type">CGFloat</span>.zero
+
+    <span class="hljs-keyword">var</span> content : <span class="hljs-type">Content</span>
+    
+    <span class="hljs-keyword">init</span>(@<span class="hljs-type">ViewBuilder</span> content: () -&gt; <span class="hljs-type">Content</span>) {
+        <span class="hljs-keyword">self</span>.content = content()
+    }
+    
+    <span class="hljs-keyword">var</span> body : some <span class="hljs-type">View</span> {
+        <span class="hljs-comment">// 2</span>
+        <span class="hljs-type">GeometryReader</span> { outReader <span class="hljs-keyword">in</span>
+            <span class="hljs-type">VStack</span> {
+                <span class="hljs-keyword">self</span>.content
+                    .background(
+                        <span class="hljs-comment">// 3</span>
+                        <span class="hljs-type">GeometryReader</span> { inReader <span class="hljs-keyword">in</span>
+                            <span class="hljs-type">Color</span>.clear
+                            <span class="hljs-comment">// 4</span>
+                            .preference(key: <span class="hljs-type">ViewHeightKey</span>.<span class="hljs-keyword">self</span>, value: inReader.size.height)
+                        })
+            }
+            <span class="hljs-comment">// 5</span>
+            .frame(height: outReader.size.height, alignment: .bottom)
+            .clipped()
+            .animation(.easeInOut)
+        }
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> consist of the internal variable that keeping tracking of our offset and content size</li><li>2.<code>//2</code> is the outter reader that lets us access the size outside of content. Since it's outside of <code>content</code> line, the reader will take up as much space as available so stacking our <code>NavigationBar</code> and <code>TextBarView</code> won't affect the content height.</li><li>3.<code>//3</code> is the inner reader that lets users access the content size. We want to create an invisible "dummy" frame that lets us access the content size and <code>Color.clear</code> is our invisible frame. As the content increase, the background-size match with the content size. Why don't we apply the reader to the content itself instead? Remember the reader takes as much space as possible. Eventually, the inner reader will hit the outer reader and bunch our view together.</li><li>4.<code>//4</code> is our preference that we will pass up the size of our content.</li></ol><h4><strong>Create Preference Key</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ViewHeightKey</span> : <span class="hljs-title">PreferenceKey</span> </span>{
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">var</span> defaultValue = <span class="hljs-type">CGFloat</span>.zero
+    
+    <span class="hljs-keyword">static</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">reduce</span><span class="hljs-params">(value: <span class="hljs-keyword">inout</span> CGFloat, nextValue: <span class="hljs-params">()</span></span></span> -&gt; <span class="hljs-type">CGFloat</span>) {
+        value += nextValue()
+    }
+}
+</code></pre><p>Our <code>PreferenceKey</code> that keeps track of the total height of the view. It will sum up the value of all subviews and return the total size of the content. We also must set a default value as required in the protocol. To understand this more, place a print line inside to print <code>value</code>, and add or remove data from messages array.</p><pre data-language="undefined"><code>
+// Sample print
+
+Initial size:
+Current value: 216.33333333333331
+
+Removing a message:
+Current value: 161.0
+
+Add a message:
+Current value: 216.33333333333331
+
+Add a long message:
+Current value: 260.3333333333333
+</code></pre><h4><strong>Adding Gesture and Offset</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ReverseScrollView</span>&lt;<span class="hljs-title">Content</span>: <span class="hljs-title">View</span>&gt; : <span class="hljs-title">View</span> </span>{    
+    <span class="hljs-keyword">var</span> body : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">GeometryReader</span> { outReader <span class="hljs-keyword">in</span>
+            <span class="hljs-type">VStack</span> {
+                <span class="hljs-comment">// Content</span>
+            }
+            <span class="hljs-comment">// 1</span>
+            .onPreferenceChange(<span class="hljs-type">ViewHeightKey</span>.<span class="hljs-keyword">self</span>) {
+                <span class="hljs-keyword">self</span>.updateContentHeight(with: $<span class="hljs-number">0</span>, outHeight: outReader.size.height)
+            }
+            <span class="hljs-comment">// 2</span>
+            .offset(y: <span class="hljs-keyword">self</span>.currentOffset + <span class="hljs-keyword">self</span>.scrollOffset)
+            <span class="hljs-comment">// 3</span>
+            .gesture( <span class="hljs-type">DragGesture</span>()
+               .onChanged({ <span class="hljs-keyword">self</span>.onDragChanged($<span class="hljs-number">0</span>) })
+               .onEnded({ <span class="hljs-keyword">self</span>.onDragEnded($<span class="hljs-number">0</span>, outHeight: outReader.size.height)})
+            )
+            
+        }
+    }
+    
+    <span class="hljs-comment">// 4</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">onDragChanged</span><span class="hljs-params">(<span class="hljs-number">_</span> value: DragGesture.Value)</span></span> {
+        <span class="hljs-keyword">self</span>.scrollOffset = value.translation.height
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">onDragEnded</span><span class="hljs-params">(<span class="hljs-number">_</span> value: DragGesture.Value, outHeight: CGFloat)</span></span> {
+        <span class="hljs-keyword">let</span> scrollOffset = value.translation.height
+        updateOffset(with: scrollOffset, outHeight: outHeight)
+        <span class="hljs-keyword">self</span>.scrollOffset = <span class="hljs-number">0</span>
+
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> use the data return from our <code>PreferenceKey</code> to recalculate our offset and content size. We will implement <code>updateContentHeight(with:outHeight)</code> later.</li><li>2.<code>//2</code> For the view to move, we must add an offset in the y-direction. In this case, we use the total offset from the content and scroll.</li><li>3.<code>//3</code> DragGesture will have 2 functions: onChanged and onEnded signify the state of drag gesture. Both give a variable that contains data such as startLocation, predictedEndLocation, change of height, change of width, etc.</li><li>4.<code>//4</code> is our 2 function use for a drag gesture. <code>onDragChanged</code> simply set the scroll value to a change in height. <code>onDragEnded</code> do the same but we also recalculate the content and their offset position to proper trigger the offset line above. When done calculating, we set offset to 0 because there is no more action after.</li></ol><h4><strong>Calculating Our Offset</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ReverseScrollView</span>&lt;<span class="hljs-title">Content</span>: <span class="hljs-title">View</span>&gt; : <span class="hljs-title">View</span> </span>{    
+    <span class="hljs-comment">// previous content</span>
+    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateOffset</span><span class="hljs-params">(with scrollOffset : CGFloat, outHeight: CGFloat)</span></span> {
+        <span class="hljs-keyword">let</span> topLimit = <span class="hljs-keyword">self</span>.contentHeight - outHeight
+        
+        <span class="hljs-keyword">if</span> topLimit &lt; .zero {
+            <span class="hljs-keyword">self</span>.currentOffset = .zero
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">var</span> predictedOffset = currentOffset + scrollOffset
+            <span class="hljs-keyword">if</span> predictedOffset &lt; .zero {
+                predictedOffset = .zero
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> predictedOffset &gt; topLimit {
+                predictedOffset = topLimit
+            }
+            <span class="hljs-keyword">self</span>.currentOffset = predictedOffset
+        }
+    }
+}
+</code></pre><ol><li>1.I'm starting with comparing the content size with the outer reader size. In case we have a lot of messages, the content size will outweigh the reader size. The <code>topLimit</code> will either be a positive or negative CGFloat.</li><li>2.If it's negative, the content will reset to its original position the moment you let drag gesture end.</li><li>3.If it's positive, it means that the content is equal or bigger to the size of the outer reader. Then we enforce the top and bottom limit of the view and "reset" the offset if it within that range. If none case passed, we set the offset directly.</li></ol><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ReverseScrollView</span>&lt;<span class="hljs-title">Content</span>: <span class="hljs-title">View</span>&gt; : <span class="hljs-title">View</span> </span>{    
+    <span class="hljs-comment">// previous content</span>
+
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateContentHeight</span><span class="hljs-params">(with height: CGFloat, outHeight: CGFloat)</span></span> {
+        <span class="hljs-keyword">let</span> topLimit = <span class="hljs-keyword">self</span>.contentHeight - height
+        <span class="hljs-keyword">self</span>.currentOffset = outHeight - height
+        <span class="hljs-keyword">self</span>.contentHeight = height
+        <span class="hljs-keyword">self</span>.updateOffset(with: topLimit, outHeight: outHeight)
+    }
+}
+</code></pre><p>This function gets trigger every time a new subview being add/remove from the content. Every time I send a message, I want to "reset" the offset position to bottom position again regardless of where you are in the scroll.</p><h4><strong>Finalizing Our Main View</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span> {
+            <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">0</span>) {
+                <span class="hljs-comment">// Navigation Bar View</span>
+
+                <span class="hljs-type">ReverseScrollView</span> {
+                    <span class="hljs-type">VStack</span>(alignment: .leading,spacing: <span class="hljs-number">15</span>) {
+                        <span class="hljs-type">ForEach</span>(<span class="hljs-keyword">self</span>.messages) { message <span class="hljs-keyword">in</span>
+                            <span class="hljs-type">HStack</span> {
+                                <span class="hljs-keyword">if</span> message.uid == <span class="hljs-string">"1"</span> {
+                                    <span class="hljs-type">Spacer</span>()
+                                    <span class="hljs-type">Text</span>(message.message)
+                                        .foregroundColor(.white)
+                                        .padding(<span class="hljs-number">10</span>)
+                                        .background(
+                                            <span class="hljs-type">RoundedRectangle</span>(cornerRadius: <span class="hljs-number">10</span>).foregroundColor(<span class="hljs-type">Color</span>(<span class="hljs-type">UIColor</span>.systemBlue))
+                                    )
+                                } <span class="hljs-keyword">else</span> {
+                                    <span class="hljs-type">Text</span>(message.message)
+                                        .foregroundColor(.white)
+                                        .padding(<span class="hljs-number">10</span>)
+                                        .background(
+                                            <span class="hljs-type">RoundedRectangle</span>(cornerRadius: <span class="hljs-number">10</span>).foregroundColor(<span class="hljs-type">Color</span>(<span class="hljs-type">UIColor</span>.systemGray))
+                                    )
+                                    <span class="hljs-type">Spacer</span>()
+                                }
+                            }.padding([.trailing, .leading], <span class="hljs-number">15</span>)
+                        }
+                    }.padding(.bottom, <span class="hljs-number">10</span>)
+                }
+
+                <span class="hljs-comment">// TextBarView</span>
+            } 
+        }.edgesIgnoringSafeArea(.all)
+    }
+}
+</code></pre><p>I separate the messages received to the left and sending messages to the right just like how iMessage does it.</p><h3><strong>Result</strong></h3><video width="250" height="500" controls>
+<source src="./result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Tune in for part 2 where I'm trying to make multiline text field and add keyboard guard.</p><p>Thank you for reading. 🙇🏻‍♂️ You can download the code <a href="./ReverseScrollView.swift" download>here</a></p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-e"><a href="/tags/swiftui">swiftui</a></li><li class="color-b"><a href="/tags/scrollview">scrollview</a></li><li class="color-e"><a href="/tags/message">message</a></li></ul></article></div></div><div><a class="pagination next" href="/blogs/message-app-ui-part-2">Message App UI Part 2</a><a class="pagination previous" href="/blogs/safari-page-stacking-animation-with-swiftui">Safari Page Stacking Animation With SwiftUI</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><a href="/aboutMe"><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></a></p><p>👨🏻‍💻 A Swift fan. 📚</p><p>Copyright © Khanh N 2020.</p></div></div></footer></body></html>

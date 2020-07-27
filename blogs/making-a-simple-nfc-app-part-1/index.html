@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/blogs/making-a-simple-nfc-app-part-1"/><meta name="twitter:url" content="https://justcodewithkhanh.com/blogs/making-a-simple-nfc-app-part-1"/><meta name="og:url" content="https://justcodewithkhanh.com/blogs/making-a-simple-nfc-app-part-1"/><title>Making a Simple NFC App Part 1 | Just Code with Khanh</title><meta name="twitter:title" content="Making a Simple NFC App Part 1 | Just Code with Khanh"/><meta name="og:title" content="Making a Simple NFC App Part 1 | Just Code with Khanh"/><meta name="description" content="Making a UIButton that triggers the NFC session."/><meta name="twitter:description" content="Making a UIButton that triggers the NFC session."/><meta name="og:description" content="Making a UIButton that triggers the NFC session."/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-blogs"><a class="selected" href="/blogs">Blogs</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-project"><a href="/project">Project</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/5PtGsRK_uIs" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Making a Simple NFC App Part 1</strong></h1><p><strong><em>Currently work with Xcode 11.4, Swift 5</em></strong></p><p>Near field communication (NFC) become increasingly popular and can be found in many top fortune companies product including Samsung, Apple, Lexus, Adidas, etc. Modern furniture is also able to control with a simple NFC tag. In this two part tutorial, I will help you build a simple NFC app that can read an NFC tag and write to it.</p><p><strong>Part 1</strong> - Basic of NFC and implement NFC read button.</p><p><strong><a href="http://justcodewithkhanh.com/blogs/making-a-simple-nfc-app-part-2/">Part 2</a></strong> - Implement NFC write function and styling to the app.</p><p class="warning"><strong>Requirement: In order for you to do this tutorial, you must have a paid Apple developer account because NFC is a premium capability.</strong></p><h3><strong>Adding NFC Tag Reading capability</strong></h3><img src="./img1.jpg" alt="img1"/><ol><li>1.Go to project <strong>General</strong> setting</li><li>2.Click on <strong>Signing &amp; Capabilities</strong></li><li>3.Click on <strong>Capability</strong></li></ol><img src="./img2.png" alt="img2"/><ol><li>1.Search for <strong>Near</strong> and add <strong>Near Field Communication Tag Reading</strong></li></ol><h3><strong>Making our button</strong></h3><p>Before this tutorial, NFC structure is mean for UIKit and I have yet found a simple way to integrate it in SwiftUI beside conform NFC object to <code>OservableObject</code> and use some tweak with <code>Promise</code> to retrieve data from <a href="https://firebase.google.com">Firestore</a> when NFC data view already triggered. My initial approach didn't work well for the current app I'm working on until I realized using <code>UIViewRepresentable</code> can trigger the NFC session and NFC data view only triggers when return read data.</p><p>We start with making a <code>nfcButton</code> conform to <code>UIViewRepresentable</code>:</p><pre data-language="swift"><code><span class="hljs-keyword">import</span> CoreNFC <span class="hljs-comment">// 1</span>
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">nfcButton</span> : <span class="hljs-title">UIViewRepresentable</span> </span>{
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> data : <span class="hljs-type">String</span> <span class="hljs-comment">// 2</span>
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeUIView</span><span class="hljs-params">(context: UIViewRepresentableContext&lt;nfcButton&gt;)</span></span> -&gt; <span class="hljs-type">UIButton</span> {
+        <span class="hljs-keyword">let</span> button = <span class="hljs-type">UIButton</span>() 
+        <span class="hljs-keyword">return</span> button <span class="hljs-comment">// 5</span>
+    } <span class="hljs-comment">// 3</span>
+    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">updateUIView</span><span class="hljs-params">(<span class="hljs-number">_</span> uiView: UIButton, context: UIViewRepresentableContext&lt;nfcButton&gt;)</span></span> {
+        <span class="hljs-comment">// Do nothing</span>
+    } <span class="hljs-comment">// 4</span>
+}
+</code></pre><ol><li>1.Don't forget to import the <code>CoreNFC</code> library.</li><li>2.In this tutorial, I will return the NFC message as a string.</li><li>3.<code>//3</code> and <code>//4</code> function is required with <code>UIViewRepresentable</code> protocol.</li><li>4.<code>//5</code> is making our <code>UIButton</code>.</li></ol><p>Next is to add a <code>Coordinator</code> to handle our NFC session logic.</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">nfcButton</span> : <span class="hljs-title">UIViewRepresentable</span> </span>{
+    ...    
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeCoordinator</span><span class="hljs-params">()</span></span> -&gt; nfcButton.<span class="hljs-type">Coordinator</span> { <span class="hljs-comment">// 1</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-type">Coordinator</span>(data: $data)
+    }
+    
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span> : <span class="hljs-title">NSObject</span>, <span class="hljs-title">NFCNDEFReaderSessionDelegate</span> </span>{ <span class="hljs-comment">// 2</span>
+        @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> data : <span class="hljs-type">String</span> <span class="hljs-comment">// 5</span>
+        
+        <span class="hljs-keyword">init</span>(data: <span class="hljs-type">Binding</span>&lt;<span class="hljs-type">String</span>&gt;) { <span class="hljs-comment">// 6 </span>
+            _data = data
+        }
+
+        <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readerSession</span><span class="hljs-params">(<span class="hljs-number">_</span> session: NFCNDEFReaderSession, didInvalidateWithError error: Error)</span></span> { <span class="hljs-comment">// 3</span>
+
+        }
+        
+        <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readerSession</span><span class="hljs-params">(<span class="hljs-number">_</span> session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage])</span></span> { <span class="hljs-comment">// 4</span>
+
+        }
+
+    }
+}
+</code></pre><ol><li>1.<code>makeCoordinator</code> function will return our <code>Coordinator</code> class for use in the <code>UIViewRepresentable</code>.</li><li>2.Our <code>Coordinator</code> class will conform to <code>NSObject</code> and <code>NFCNDEFReaderSessionDelegate</code> in order to access CoreNFC function</li><li>3.<code>//3</code> and <code>//4</code> is the minimum required function when any object cast with the <code>NFCNDEFReaderSessionDelegate</code> protocol. Somewhere in a higher hierarchy controller will run <code>//3</code> when a session hit with error and <code>//4</code> when a session receives messages from the NFC tag.</li><li>4.I pass the same <code>data</code> variable from the parent so I can set the value when I receive messages from <code>//4</code>.</li><li>5.Don't forget <code>init()</code></li></ol><h3><strong>Configure our Coordinator</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span> : <span class="hljs-title">NSObject</span>, <span class="hljs-title">NFCNDEFReaderSessionDelegate</span> </span>{
+    <span class="hljs-keyword">var</span> session : <span class="hljs-type">NFCNDEFReaderSession?</span> <span class="hljs-comment">// 1</span>
+    ...
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readerSession</span><span class="hljs-params">(<span class="hljs-number">_</span> session: NFCNDEFReaderSession, didInvalidateWithError error: Error)</span></span> { <span class="hljs-comment">// 2</span>
+        <span class="hljs-comment">// Check the invalidation reason from the returned error.</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> readerError = error <span class="hljs-keyword">as</span>? <span class="hljs-type">NFCReaderError</span> {
+            <span class="hljs-comment">// Show an alert when the invalidation reason is not because of a</span>
+            <span class="hljs-comment">// successful read during a single-tag read session, or because the</span>
+            <span class="hljs-comment">// user canceled a multiple-tag read session from the UI or</span>
+            <span class="hljs-comment">// programmatically using the invalidate method call.</span>
+            <span class="hljs-keyword">if</span> (readerError.code != .readerSessionInvalidationErrorFirstNDEFTagRead)
+                &amp;&amp; (readerError.code != .readerSessionInvalidationErrorUserCanceled) {
+                <span class="hljs-built_in">print</span>(<span class="hljs-string">"Error nfc read: \(readerError.localizedDescription)"</span>)
+            }
+        }
+
+        <span class="hljs-comment">// To read new tags, a new session instance is required.</span>
+        <span class="hljs-keyword">self</span>.session = <span class="hljs-literal">nil</span>
+    }
+}
+</code></pre><ol><li>1.<code>session</code> will be used throughout the <code>Coordinator</code> to control the NFC session.</li><li>2.In the error function, we simply just going to print if we encounter an error. You can incorporate some sort of alert trigger to display error in the parent view. Content can be found at <a href="https://developer.apple.com/documentation/corenfc/building_an_nfc_tag-reader_app">Apple Build an NFC Tag-Reader App</a>.</li></ol><p>Let's move to messages function:</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span> : <span class="hljs-title">NSObject</span>, <span class="hljs-title">NFCNDEFReaderSessionDelegate</span> </span>{
+    ... 
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readerSession</span><span class="hljs-params">(<span class="hljs-number">_</span> session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage])</span></span> {
+        <span class="hljs-keyword">guard</span>
+            <span class="hljs-keyword">let</span> nfcMess = messages.first,
+            <span class="hljs-keyword">let</span> record = nfcMess.records.first,
+            record.typeNameFormat == .absoluteURI || record.typeNameFormat == .nfcWellKnown,
+            <span class="hljs-keyword">let</span> payload = <span class="hljs-type">String</span>(data: record.payload, encoding: .utf8)
+        <span class="hljs-keyword">else</span> {
+             <span class="hljs-keyword">return</span>
+        }
+         
+        <span class="hljs-built_in">print</span>(payload)
+        <span class="hljs-keyword">self</span>.data = payload
+    }
+    ...
+}
+    
+</code></pre><p>Every time you read an NFC NDEF format tag, you will receive a payload of the <code>NFCNDEFMessage</code> array, and each message consists of <code>NFCNDEFPayload</code> array known as a record. NDEF is a smart format is used to store and exchange information like URI, plain text, phone, contact, location, etc. A well-known tag like Mifare Ultralight, which used for this post, can be configured as the NDEF tag, and data written by NFC device as <code>NFCNDEFPayload</code> can be understood by another NFC device. In this post, I will only access the first record of the message payload and make sure it is a <code>wellknowntype</code> or <code>absoluteURI</code>, commonly used for URL format, before setting the <code>data</code> variable.</p><h3><strong>Make UIButton trigger our session</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Coordinator</span> : <span class="hljs-title">NSObject</span>, <span class="hljs-title">NFCNDEFReaderSessionDelegate</span> </span>{
+    ...
+    <span class="hljs-meta">@objc</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">beginScan</span><span class="hljs-params">(<span class="hljs-number">_</span> sender: <span class="hljs-keyword">Any</span>)</span></span> {
+        <span class="hljs-keyword">guard</span> <span class="hljs-type">NFCNDEFReaderSession</span>.readingAvailable <span class="hljs-keyword">else</span> {
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">"error: Scanning not support"</span>)
+            <span class="hljs-keyword">return</span>
+        }
+         
+        session = <span class="hljs-type">NFCNDEFReaderSession</span>(delegate: <span class="hljs-keyword">self</span>, queue: .main, invalidateAfterFirstRead: <span class="hljs-literal">true</span>)
+        session?.alertMessage = <span class="hljs-string">"Hold your iphone near to scan."</span>
+        session?.begin()
+    }
+    ...
+}
+</code></pre><p>Adding <code>guard</code> to make sure the device is compatible with NFC. This can be omitted because any iPhone 6 and above are NFC compatible. <code>beginScan</code> function will activate when the button is pressed and trigger an <code>NFCNDEFReaderSession</code> to start scanning.</p><p>Go back to <code>UIViewRepresentable</code> to target our button to <code>beginScan</code> function. I also added color and title and make the button visible.</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">nfcButton</span> : <span class="hljs-title">UIViewRepresentable</span> </span>{
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">makeUIView</span><span class="hljs-params">(context: UIViewRepresentableContext&lt;nfcButton&gt;)</span></span> -&gt; <span class="hljs-type">UIButton</span> {
+        ...
+        button.setTitle(<span class="hljs-string">"Read NFC"</span>, <span class="hljs-keyword">for</span>: .normal)
+        button.backgroundColor = <span class="hljs-type">UIColor</span>.blue
+        button.addTarget(context.coordinator, action: #selector(context.coordinator.beginScan(<span class="hljs-number">_</span>:)), <span class="hljs-keyword">for</span>: .touchUpInside)
+        ...
+    }
+    ...
+}
+</code></pre><p>Now you can call <code>nfcButton</code> in <code>Content</code> view:</p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">var</span> data = <span class="hljs-string">""</span>
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">VStack</span> {
+            <span class="hljs-type">Text</span>(data).background(<span class="hljs-type">Color</span>.red)
+            nfcButton(data: <span class="hljs-keyword">self</span>.$data)
+        }
+    }
+}
+</code></pre><p>Run the app on your phone as simulator doesn't have the NFC hardware technology.</p><video width="250" height="500" controls>
+<source src="./result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Thank you for reading and tune in next post to make an NFC write. 🐯</p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-a"><a href="/tags/swiftui">swiftui</a></li><li class="color-b"><a href="/tags/nfc">nfc</a></li></ul></article></div></div><div><a class="pagination next" href="/blogs/making-a-simple-nfc-app-part-2">Making a Simple NFC App Part 2</a><a class="pagination previous" href="/blogs/swiftui-full-screen-modal">SwiftUI: Full Screen Modal</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><a href="/aboutMe"><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></a></p><p>👨🏻‍💻 A Swift fan. 📚</p><p>Copyright © Khanh N 2020.</p></div></div></footer></body></html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1.0"></meta><head><meta charset="UTF-8"/><meta name="og:site_name" content="Just Code with Khanh"/><link rel="canonical" href="https://justcodewithkhanh.com/blogs/replicating-app-store-homepage-with-expand-view"/><meta name="twitter:url" content="https://justcodewithkhanh.com/blogs/replicating-app-store-homepage-with-expand-view"/><meta name="og:url" content="https://justcodewithkhanh.com/blogs/replicating-app-store-homepage-with-expand-view"/><title>Replicate App Store Homepage With Expand View | Just Code with Khanh</title><meta name="twitter:title" content="Replicate App Store Homepage With Expand View | Just Code with Khanh"/><meta name="og:title" content="Replicate App Store Homepage With Expand View | Just Code with Khanh"/><meta name="description" content="Building App store home page with animation, gesture, and scroll content."/><meta name="twitter:description" content="Building App store home page with animation, gesture, and scroll content."/><meta name="og:description" content="Building App store home page with animation, gesture, and scroll content."/><meta name="twitter:card" content="summary"/><link rel="stylesheet" href="/styles.css" type="text/css"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><link rel="shortcut icon" href="/images/favicon.png" type="image/png"/><link rel="alternate" href="/feed.rss" type="application/rss+xml" title="Subscribe to Just Code with Khanh"/><meta name="twitter:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/><meta name="og:image" content="https://justcodewithkhanh.com/img/logo_with_background.jpg"/></head><body class="item-page"><div id="header"><div class="wrapper"><div class="inner"><div class="logo"><a href="/"><img src="/img/logo_expand.png"/></a><p class="description">Learning by doing. Just start coding!!! 👨🏻‍💻</p></div><nav><ul><li class="nav-blogs"><a class="selected" href="/blogs">Blogs</a></li><li class="nav-leetcode"><a href="/leetcode">LeetCode</a></li><li class="nav-project"><a href="/project">Project</a></li><li class="nav-aboutme"><a href="/aboutMe">About Me</a></li></ul></nav></div></div></div><div id="main"><div class="wrapper"><div class="inner"><article><div class="content"><div class="iframe-container">
+<iframe src="https://www.youtube.com/embed/o31ZzGuW-1M" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div><h1><strong>Replicate App Store Homepage With Expand View</strong></h1><p><strong><em>Currently work with Xcode 11.4, Swift 5</em></strong></p><p>As iOS developers, we are all familiar with Apple's fancy expanding view in their app store. Everything from the animation to the gesture trigger to the scroll view is super clean. So today, we are trying to replicate the Apple App store homepage with SwiftUI. It won't be 100% perfect, but the result is pretty close and work with dynamic data.</p><h3><strong>Preparing Data</strong></h3><pre data-language="swift"><code><span class="hljs-comment">// Item for data</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Item</span> : <span class="hljs-title">Identifiable</span> </span>{
+    <span class="hljs-keyword">var</span> id = <span class="hljs-type">UUID</span>()
+    <span class="hljs-keyword">var</span> title : <span class="hljs-type">String</span>
+    <span class="hljs-keyword">var</span> subTitle : <span class="hljs-type">String</span>
+    <span class="hljs-keyword">var</span> image : <span class="hljs-type">String</span>
+    <span class="hljs-keyword">var</span> content : <span class="hljs-type">String</span>
+}
+
+<span class="hljs-comment">// Get Screen size</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Screen</span> </span>{
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">let</span> height = <span class="hljs-type">UIScreen</span>.main.bounds.height
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">let</span> width = <span class="hljs-type">UIScreen</span>.main.bounds.width
+}
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-comment">// Content</span>
+    }
+    
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">var</span> items = [
+        <span class="hljs-type">Item</span>(title: <span class="hljs-string">"View Today Post"</span>, subTitle: <span class="hljs-string">"Learn more and keep learning."</span>, image: <span class="hljs-string">"img1"</span>, content: <span class="hljs-string">"There was something in the tree. It was difficult to tell from the ground, but Rachael could see movement. She squinted her eyes and peered in the direction of the movement, trying to decipher exactly what she had spied. The more she peered, however, the more she thought it might be a figment of her imagination. Nothing seemed to move until the moment she began to take her eyes off the tree. Then in the corner of her eye, she would see the movement again and begin the process of staring again. \n Out of another, I get a lovely view of the bay and a little private wharf belonging to the estate. There is a beautiful shaded lane that runs down there from the house. I always fancy I see people walking in these numerous paths and arbors, but John has cautioned me not to give way to fancy in the least. He says that with my imaginative power and habit of story-making a nervous weakness like mine is sure to lead to all manner of excited fancies and that I ought to use my will and good sense to check the tendency. So I try.\n He sat staring at the person in the train stopped at the station going in the opposite direction. She sat staring ahead, never noticing that she was being watched. Both trains began to move and he knew that in another timeline or in another universe, they had been happy together."</span>),
+        <span class="hljs-type">Item</span>(title: <span class="hljs-string">"Unity Planet"</span>, subTitle: <span class="hljs-string">"Build the game you always dream of."</span>, image: <span class="hljs-string">"img2"</span>, content: <span class="hljs-string">"There was something in the tree. It was difficult to tell from the ground, but Rachael could see movement. She squinted her eyes and peered in the direction of the movement, trying to decipher exactly what she had spied. The more she peered, however, the more she thought it might be a figment of her imagination. Nothing seemed to move until the moment she began to take her eyes off the tree. Then in the corner of her eye, she would see the movement again and begin the process of staring again. \n Out of another, I get a lovely view of the bay and a little private wharf belonging to the estate. There is a beautiful shaded lane that runs down there from the house. I always fancy I see people walking in these numerous paths and arbors, but John has cautioned me not to give way to fancy in the least. He says that with my imaginative power and habit of story-making a nervous weakness like mine is sure to lead to all manner of excited fancies and that I ought to use my will and good sense to check the tendency. So I try. \n He sat staring at the person in the train stopped at the station going in the opposite direction. She sat staring ahead, never noticing that she was being watched. Both trains began to move and he knew that in another timeline or in another universe, they had been happy together."</span>),
+        <span class="hljs-type">Item</span>(title: <span class="hljs-string">"Firewatch View"</span>, subTitle: <span class="hljs-string">"Follow your passion, it will guide your life"</span>, image: <span class="hljs-string">"img3"</span>, content: <span class="hljs-string">"There was something in the tree. It was difficult to tell from the ground, but Rachael could see movement. She squinted her eyes and peered in the direction of the movement, trying to decipher exactly what she had spied. The more she peered, however, the more she thought it might be a figment of her imagination. Nothing seemed to move until the moment she began to take her eyes off the tree. Then in the corner of her eye, she would see the movement again and begin the process of staring again. \n Out of another, I get a lovely view of the bay and a little private wharf belonging to the estate. There is a beautiful shaded lane that runs down there from the house. I always fancy I see people walking in these numerous paths and arbors, but John has cautioned me not to give way to fancy in the least. He says that with my imaginative power and habit of story-making a nervous weakness like mine is sure to lead to all manner of excited fancies and that I ought to use my will and good sense to check the tendency. So I try.\n He sat staring at the person in the train stopped at the station going in the opposite direction. She sat staring ahead, never noticing that she was being watched. Both trains began to move and he knew that in another timeline or in another universe, they had been happy together."</span>),
+        <span class="hljs-type">Item</span>(title: <span class="hljs-string">"Rocket Man Riding Through The Universe"</span>, subTitle: <span class="hljs-string">"Nothing better than riding through the universe."</span>, image: <span class="hljs-string">"img4"</span>, content: <span class="hljs-string">"There was something in the tree. It was difficult to tell from the ground, but Rachael could see movement. She squinted her eyes and peered in the direction of the movement, trying to decipher exactly what she had spied. The more she peered, however, the more she thought it might be a figment of her imagination. Nothing seemed to move until the moment she began to take her eyes off the tree. Then in the corner of her eye, she would see the movement again and begin the process of staring again. \n Out of another, I get a lovely view of the bay and a little private wharf belonging to the estate. There is a beautiful shaded lane that runs down there from the house. I always fancy I see people walking in these numerous paths and arbors, but John has cautioned me not to give way to fancy in the least. He says that with my imaginative power and habit of story-making a nervous weakness like mine is sure to lead to all manner of excited fancies and that I ought to use my will and good sense to check the tendency. So I try.\n He sat staring at the person in the train stopped at the station going in the opposite direction. She sat staring ahead, never noticing that she was being watched. Both trains began to move and he knew that in another timeline or in another universe, they had been happy together."</span>)
+    ]
+}
+</code></pre><ol><li>1.<code>Item</code> is our data struct</li><li>2.Instead of using <code>GeometryReader</code> to get the frame, I will use native screen size instead. A child <code>GeometryReader</code> size can get affected by the parent geometry so that it can mess up the proper sizing. This is the preference that I usually used.</li><li>3.Fill your <code>ContentView</code> with the above data. It's an array of <code>Item</code> with some random data that I threw in. For <code>image</code>, you can use any random 6 images you can find in your computer and name them with: <code>avatar, img1, img2, ... ,img5</code>.</li></ol><h3><strong>Building The Header</strong></h3><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">var</span> isExpand = <span class="hljs-literal">false</span> <span class="hljs-comment">//1</span>
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">var</span> activeId = <span class="hljs-type">UUID</span>() <span class="hljs-comment">//2</span>
+
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span> {
+            <span class="hljs-type">Color</span>(<span class="hljs-keyword">self</span>.isExpand ? <span class="hljs-type">UIColor</span>.systemGray2 : .white).edgesIgnoringSafeArea(.all) <span class="hljs-comment">//3</span>
+            
+            <span class="hljs-type">ScrollView</span>(.vertical, showsIndicators: <span class="hljs-literal">true</span>) { <span class="hljs-comment">//4</span>
+                <span class="hljs-type">VStack</span>(alignment: .leading, spacing: <span class="hljs-number">0</span>) {
+                    <span class="hljs-type">Text</span>(<span class="hljs-string">"SATURDAY, MAY 2"</span>)
+                        .foregroundColor(<span class="hljs-type">Color</span>(<span class="hljs-type">UIColor</span>.systemGray))
+                    <span class="hljs-type">HStack</span> {
+                        <span class="hljs-type">Text</span>(<span class="hljs-string">"Today"</span>)
+                            .font(.system(.title))
+                            .fontWeight(.semibold)
+                        <span class="hljs-type">Spacer</span>()
+                        <span class="hljs-type">Image</span>(<span class="hljs-string">"avatar"</span>)
+                        .resizable()
+                            .frame(width: <span class="hljs-number">35</span>, height: <span class="hljs-number">35</span>)
+                    }
+                }.padding()
+                .opacity(<span class="hljs-keyword">self</span>.isExpand ? <span class="hljs-number">0</span> : <span class="hljs-number">1</span>) 
+            }
+        }
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> is used to let anything outside of <code>ForEach</code>, which we will build later on, know that expand animation is happening.</li><li>2.<code>//2</code> is very important. You can think of this variable work like <code>NavigationLink</code> that helps each item act independently. We won't want to expand every item when only 1 is clicked.</li><li>3.<code>//3</code> is to show a gray background when we use a drag gesture to close the item.</li><li>4.<code>//4</code> is our styling for the header.</li></ol><h3><strong>Making Expanding View</strong></h3><h4><strong>Building Thumbnail and Expand Animation</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ExpandView</span> : <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> isExpand : <span class="hljs-type">Bool</span> <span class="hljs-comment">//1</span>
+    @<span class="hljs-type">Binding</span> <span class="hljs-keyword">var</span> activeId : <span class="hljs-type">UUID</span> <span class="hljs-comment">//2</span>
+    <span class="hljs-keyword">var</span> data : <span class="hljs-type">Item</span> <span class="hljs-comment">//3</span>
+    
+    <span class="hljs-keyword">var</span> body : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span>(alignment: .top) {
+            <span class="hljs-comment">// Thumbnail section</span>
+            <span class="hljs-type">Image</span>(data.image) <span class="hljs-comment">//4</span>
+            .resizable()
+            .clipShape(<span class="hljs-type">RoundedRectangle</span>(cornerRadius: <span class="hljs-number">20</span>))
+            .shadow(radius: <span class="hljs-number">5</span>)
+            .onTapGesture {
+                <span class="hljs-keyword">self</span>.isExpand = <span class="hljs-literal">true</span>
+                <span class="hljs-keyword">self</span>.activeId = <span class="hljs-keyword">self</span>.data.id
+            }
+            .opacity(<span class="hljs-keyword">self</span>.activeId == data.id ? <span class="hljs-number">0</span> : <span class="hljs-number">1</span>)
+            
+            <span class="hljs-comment">// Title section</span>
+            <span class="hljs-type">HStack</span> { <span class="hljs-comment">//5</span>
+                <span class="hljs-type">VStack</span>(alignment: .leading, spacing: <span class="hljs-number">0</span>) {
+                    <span class="hljs-type">Text</span>(data.subTitle)
+                        .foregroundColor(<span class="hljs-type">Color</span>(<span class="hljs-type">UIColor</span>.systemGray))
+                        .fontWeight(.semibold)
+                    
+                    <span class="hljs-type">Text</span>(data.title)
+                        .font(.system(.title))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+                
+                <span class="hljs-type">Spacer</span>()
+            }.padding()
+            .opacity(<span class="hljs-keyword">self</span>.activeId == data.id ? <span class="hljs-number">0</span> : <span class="hljs-number">1</span>)
+            
+        }<span class="hljs-comment">// ZStack</span>
+            .frame(height: <span class="hljs-keyword">self</span>.activeId == <span class="hljs-keyword">self</span>.data.id ? <span class="hljs-type">Screen</span>.height : <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.45</span>) <span class="hljs-comment">//6</span>
+            .animation(.spring(response: <span class="hljs-number">0.6</span>, dampingFraction: <span class="hljs-number">0.8</span>, blendDuration: <span class="hljs-number">0.6</span>))
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> and <code>//2</code> are explained and pass down from the parent.</li><li>2.<code>//3</code> is data that will use for each item.</li><li>3.<code>//4</code> is the thumbnail image that will be used to trigger the animation hence the <code>onTapGesture</code>. Also, we will make the image disappear when the view is expanded. This simply hides it for the scale effect.</li><li>4.<code>//5</code> is the styling title section. Since we want it to be top left, we can use a combination of <code>Spacer</code>, <code>HStack</code>, and <code>VStack</code> to get it there. Add some padding to make it stay inside the frame. The opacity works the same way as <code>//4</code>.</li><li>5.<code>//6</code> is the part that allows the view to expand to full screen on active, else size for it will be at <code>Screen.height * 0.45</code>. Don't use <code>maxHeight</code> here because this gives the view an option to not take up the whole screen.</li></ol><h4><strong>Adding Scrollable Content</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ExpandView</span> : <span class="hljs-title">View</span> </span>{
+    <span class="hljs-keyword">var</span> body : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span>(alignment: .top) {            
+            <span class="hljs-comment">// ...</span>
+
+            <span class="hljs-comment">// Over lay content</span>
+            <span class="hljs-type">ZStack</span> { <span class="hljs-comment">//1</span>
+                <span class="hljs-type">Color</span>.white.edgesIgnoringSafeArea(.all)
+                
+                <span class="hljs-type">ScrollView</span>(.vertical, showsIndicators: <span class="hljs-literal">true</span>) {
+                    <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">20</span>) {
+                        <span class="hljs-type">Image</span>(data.image)
+                            .resizable()
+                            .frame(maxHeight: <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.45</span>)
+                        
+                        <span class="hljs-type">Text</span>(data.content)
+                            .foregroundColor(.black)
+                            .padding()
+                    }.padding(.bottom)
+                }.edgesIgnoringSafeArea(.all)
+                
+                <span class="hljs-comment">// Making close button</span>
+                <span class="hljs-type">VStack</span> {
+                    <span class="hljs-type">HStack</span> {
+                        <span class="hljs-type">Spacer</span>()
+                        
+                        <span class="hljs-type">Button</span>(action: {
+                            <span class="hljs-keyword">self</span>.isExpand = <span class="hljs-literal">false</span>
+                            <span class="hljs-keyword">self</span>.activeId = <span class="hljs-type">UUID</span>()
+                        }) {
+                            <span class="hljs-type">Image</span>(systemName: <span class="hljs-string">"xmark"</span>)
+                                .foregroundColor(<span class="hljs-type">Color</span>.white.opacity(<span class="hljs-number">0.2</span>))
+                        }.frame(width: <span class="hljs-number">30</span>, height: <span class="hljs-number">30</span>)
+                        .background(
+                            <span class="hljs-type">Circle</span>().foregroundColor(<span class="hljs-type">Color</span>.white.opacity(<span class="hljs-number">0.6</span>))
+                        )
+                    }.padding(.top, <span class="hljs-number">30</span>)
+                    
+                    <span class="hljs-type">Spacer</span>()
+                }.padding()
+            }.opacity(<span class="hljs-keyword">self</span>.activeId == data.id ? <span class="hljs-number">1</span> : <span class="hljs-number">0</span>)
+            
+        }<span class="hljs-comment">// ZStack</span>
+
+        <span class="hljs-comment">// ...</span>
+    }
+}
+</code></pre><ol><li>1.Embeding <code>//1</code> in <code>ZStack</code> so we can build the background and close button. Since we want the close button to persist through the entire scroll, we will place it above the <code>ScrollView</code>.</li></ol><h4><strong>Put In Gesture</strong></h4><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ExpandView</span> : <span class="hljs-title">View</span> </span>{
+    @<span class="hljs-type">State</span> <span class="hljs-keyword">var</span> dragValue = <span class="hljs-type">CGSize</span>.zero <span class="hljs-comment">//1</span>
+    
+    <span class="hljs-keyword">var</span> body : some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span>(alignment: .top) {
+            <span class="hljs-comment">//...</span>
+            
+            <span class="hljs-comment">// Over lay content</span>
+            <span class="hljs-type">ZStack</span> {
+                <span class="hljs-comment">// Scrolling content</span>
+            }
+            .gesture(
+                <span class="hljs-keyword">self</span>.activeId == data.id ? <span class="hljs-comment">//2</span>
+                    <span class="hljs-type">DragGesture</span>().onChanged({ value <span class="hljs-keyword">in</span>
+                    <span class="hljs-keyword">guard</span> value.translation.height &lt; <span class="hljs-number">200</span> <span class="hljs-keyword">else</span> {<span class="hljs-keyword">return</span>}
+                        <span class="hljs-keyword">if</span> value.translation.height &gt; <span class="hljs-number">400</span> { <span class="hljs-comment">//3</span>
+                            <span class="hljs-keyword">self</span>.isExpand = <span class="hljs-literal">false</span>
+                            <span class="hljs-keyword">self</span>.activeId = <span class="hljs-type">UUID</span>()
+                            <span class="hljs-keyword">self</span>.dragValue = .zero
+                        } <span class="hljs-keyword">else</span> {
+                            <span class="hljs-keyword">self</span>.dragValue = value.translation
+                        }
+                    }).onEnded({ value <span class="hljs-keyword">in</span>
+                        <span class="hljs-keyword">if</span> value.translation.height &gt; <span class="hljs-number">300</span> {
+                            <span class="hljs-keyword">self</span>.isExpand = <span class="hljs-literal">false</span>
+                            <span class="hljs-keyword">self</span>.activeId = <span class="hljs-type">UUID</span>()
+                        }
+                            <span class="hljs-keyword">self</span>.dragValue = .zero
+                    }) : <span class="hljs-literal">nil</span>
+            )
+            .scaleEffect(<span class="hljs-number">1</span> - (<span class="hljs-keyword">self</span>.dragValue.height / <span class="hljs-number">1000</span>)) <span class="hljs-comment">//4</span>
+            
+        }<span class="hljs-comment">// ZStack</span>
+
+        <span class="hljs-comment">//...</span>
+    }
+}
+</code></pre><ol><li>1.<code>//1</code> will be used to get the drag gesture value and set our scale animation.</li><li>2.<code>//2</code>, We only want to activate gesture when the view is expanded. Also unless the translation value is above 200, the drag gesture won't do anything <code>onChanged</code>. I also place a restriction <code>//3</code> that close the expanded view after it passes a value of 400. <code>onEnded</code> is optional but what if I only drag in the range of 200-400, I want anything above 300 to be close the expand view when I release my finger.</li><li>3.<code>//4</code>, the <code>dragValue</code> will usually be in the hundreds so I want to divide it by 1000 to make it within the range of 0-1, which in our case will never be 1000 because be set our limit of 400 above.</li></ol><h3><strong>ScrollView In Main Page</strong></h3><p>The final stretch is to list all our item in the <code>ContentView</code></p><pre data-language="swift"><code><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ContentView</span>: <span class="hljs-title">View</span> </span>{
+    <span class="hljs-comment">//...</span>
+
+    <span class="hljs-keyword">var</span> body: some <span class="hljs-type">View</span> {
+        <span class="hljs-type">ZStack</span> {
+             <span class="hljs-comment">//...</span>
+
+             <span class="hljs-comment">// Let's seperate each item by using their UUID</span>
+             <span class="hljs-type">VStack</span>(spacing: <span class="hljs-number">30</span>) {
+                 <span class="hljs-type">ForEach</span>(items) { item <span class="hljs-keyword">in</span>
+                     <span class="hljs-type">GeometryReader</span> { reader <span class="hljs-keyword">in</span> <span class="hljs-comment">//1</span>
+                         <span class="hljs-type">ExpandView</span>(isExpand: <span class="hljs-keyword">self</span>.$isExpand, activeId: <span class="hljs-keyword">self</span>.$activeId, data: item)
+                             .offset(y: <span class="hljs-keyword">self</span>.activeId == item.id ? -reader.frame(<span class="hljs-keyword">in</span>: .global).minY : <span class="hljs-number">0</span>) <span class="hljs-comment">//2</span>
+                             .opacity(<span class="hljs-keyword">self</span>.activeId != item.id &amp;&amp; <span class="hljs-keyword">self</span>.isExpand ? <span class="hljs-number">0</span> : <span class="hljs-number">1</span>) <span class="hljs-comment">// If not current card and expand mode is true, hide it //3</span>
+                     }.frame(height: <span class="hljs-type">Screen</span>.height * <span class="hljs-number">0.45</span>) <span class="hljs-comment">//4</span>
+                     .frame(maxWidth: <span class="hljs-keyword">self</span>.isExpand ? <span class="hljs-type">Screen</span>.width : <span class="hljs-type">Screen</span>.width * <span class="hljs-number">0.9</span>)
+                 }
+             } <span class="hljs-comment">// VStack</span>
+        } <span class="hljs-comment">// ZStack</span>
+    } <span class="hljs-comment">// body</span>
+}
+</code></pre><ol><li>1.<code>//1</code> and <code>//2</code>, we use <code>GeometryReader</code> for the sake of getting a minY value so we can push the view to the top of the screen with <code>offset</code>.</li><li>2.<code>//3</code> saying that if there is actively expand view and you aren't the view that is expanded, hide yourself so when scale effect happens you won't show up.</li><li>3.Without <code>//4</code>, all the items will collapse and stack on each other.</li></ol><h3><strong>Showing It Work With Dynamic Data</strong></h3><p>In the <code>Image("avatar")</code>, add a tap gesture to append another <code>Item</code> to the <code>items</code> array, you will see the content being add at the end when you scroll down. This is where you use <code>img5</code> just to see that something got added.</p><h3><strong>Result of Our Awesome Animation</strong></h3><p>I think it's close enough to the Apple homepage. There is still a small scale effect when you scroll pass bottom or accidentally activate scale effect at top of <code>ScrollView</code>. I've tried scale effect with a trackable scroll view that uses <code>CGFloat</code>, but it didn't work as best as this method. Trackable scroll view preference key doesn't update as often as we want so scale effect act weirdly.</p><video width="250" height="500" controls>
+    <source src="./result.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video><p>Thank you for reading. 🙇🏻‍♂️ You can download the code <a href="./ExpandView.swift" download>here</a></p></div><span>Tagged with: </span><ul class="tag-list"><li class="color-a"><a href="/tags/design">design</a></li><li class="color-b"><a href="/tags/swiftui">swiftui</a></li></ul></article></div></div><div><a class="pagination next" href="/blogs/safari-page-stacking-animation-with-swiftui">Safari Page Stacking Animation With SwiftUI</a><a class="pagination previous" href="/blogs/making-a-simple-nfc-app-part-2">Making a Simple NFC App Part 2</a></div></div><footer id="footer"><div class="wrapper"><div class="inner"><p><a href="/aboutMe"><img id="profile" src="/img/profile_img_circle.png" alt="Khanh"/></a></p><p>👨🏻‍💻 A Swift fan. 📚</p><p>Copyright © Khanh N 2020.</p></div></div></footer></body></html>
